@@ -1,6 +1,5 @@
 import { useData } from './data/DataProvider'
 import FetchAccounts from "./components/FetchAccounts"
-import './App.css'
 import { Link } from 'react-router-dom'
 import { GoBackButton } from './components/goBackButton'
 

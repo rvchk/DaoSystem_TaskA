@@ -3,6 +3,8 @@ import { useData } from '../../data/DataProvider'
 
 export default function VotingCard({ voting }) {
   const [name, setName] = useState()
+  const [seconds, setSeconds] = useState()
+  const [minutes, setMinutes] = useState()
   const { smartContract } = useData()
   const [currentTime, setCurrentTime] = useState(null);
 
@@ -15,7 +17,20 @@ export default function VotingCard({ voting }) {
     if (smartContract) {
       getUser()
     }
-  }, [smartContract])
+    const interval = setInterval(async () => {
+      const time = Date.now();
+      setCurrentTime(time);
+      let timeLeft = String(voting.endTime) - time.toString().slice(0, 10)
+      setMinutes(Math.floor(timeLeft / 60))
+      setSeconds(timeLeft % 60)
+      if (timeLeft <= 0) {
+        clearInterval(interval)
+        setMinutes(0)
+        setSeconds(0)
+      } 
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [smartContract]);
 
   const copyProposeId = () => {
     navigator.clipboard.writeText(voting?.id)
@@ -27,13 +42,6 @@ export default function VotingCard({ voting }) {
     alert("Адрес пользователя скопирован")
   }
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const time = Date.now();
-      setCurrentTime(time);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [smartContract]);
 
   return (
     <div className='ProposalCard'>
@@ -49,8 +57,15 @@ export default function VotingCard({ voting }) {
       <p>Голоса за: {voting?.votesFor}</p>
       <p>Голоса против: {voting?.votesFor}</p>
       <p>Статус голосования: {voting?.votingStatus}</p>
-      <p>{currentTime?.toString().slice(0, 10)}</p>
-      <p>{voting?.endTime}</p>
+
+      <div>
+        <h4>Обратный таймер</h4>
+        {seconds == 0 ? (
+          <p>Время завершилось!</p>
+        ) : (
+          <p>{`${minutes ? minutes + ":" : ""}${seconds < 10 ? '0' : ''}${seconds}`}</p>
+        )}
+      </div>
     </div >
   )
 }
