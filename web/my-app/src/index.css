@@ -204,3 +204,27 @@ input {
   margin-top: 30px;
   display: block;
 }
+
+#checkbox-true,
+#checkbox-false {
+  width: 25px;
+}
+
+.checkbox-block {
+  display: "flex";
+  margin-bottom: 15px;
+}
+
+.checkbox-block div {
+  width: 100px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.checkbox-block label {
+  padding-right: 20px;
+}
+
+.checkbox-block input {
+  display: inline;
+}

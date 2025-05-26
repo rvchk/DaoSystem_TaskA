@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useData } from '../../data/DataProvider'
 
 export default function VotingCard({ voting }) {
   const [name, setName] = useState()
-  const [seconds, setSeconds] = useState()
-  const [minutes, setMinutes] = useState()
+  const [seconds, setSeconds] = useState("")
+  const [minutes, setMinutes] = useState("")
   const { smartContract } = useData()
-  const [currentTime, setCurrentTime] = useState(null);
 
   async function getUser() {
     const user = await smartContract.getUserObject(voting.initiator)
@@ -19,7 +18,6 @@ export default function VotingCard({ voting }) {
     }
     const interval = setInterval(async () => {
       const time = Date.now();
-      setCurrentTime(time);
       let timeLeft = String(voting.endTime) - time.toString().slice(0, 10)
       setMinutes(Math.floor(timeLeft / 60))
       setSeconds(timeLeft % 60)
@@ -27,7 +25,7 @@ export default function VotingCard({ voting }) {
         clearInterval(interval)
         setMinutes(0)
         setSeconds(0)
-      } 
+      }
     }, 1000);
     return () => clearInterval(interval);
   }, [smartContract]);
@@ -41,7 +39,6 @@ export default function VotingCard({ voting }) {
     navigator.clipboard.writeText(voting.initiator)
     alert("Адрес пользователя скопирован")
   }
-
 
   return (
     <div className='ProposalCard'>
@@ -59,8 +56,8 @@ export default function VotingCard({ voting }) {
       <p>Статус голосования: {voting?.votingStatus}</p>
 
       <div>
-        <h4>Обратный таймер</h4>
-        {seconds == 0 ? (
+        <h3 style={{ marginTop: "15px" }}>Обратный таймер</h3>
+        {(seconds == 0 && minutes == 0) ? (
           <p>Время завершилось!</p>
         ) : (
           <p>{`${minutes ? minutes + ":" : ""}${seconds < 10 ? '0' : ''}${seconds}`}</p>

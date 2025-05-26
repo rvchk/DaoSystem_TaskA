@@ -29,6 +29,7 @@ function Propose() {
     for (let i = 0; i < pastProposals.length; i++) {
       details.push(pastProposals[i].returnValues);
     }
+    console.log(details)
     setUserProposals(details)
     return details;
   }

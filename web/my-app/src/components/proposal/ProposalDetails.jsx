@@ -17,7 +17,7 @@ export const ProposalDetails = ({ proposal }) => {
 
   return (
     <div className="proposal-details">
-      {proposal.proposalType == "0" || proposal.proposalType == "1" && (
+      {(proposal.proposalType == "0" || proposal.proposalType == "1") && (
         <div>
           <p>Адрес стартапа: {proposal.targetAddress}</p>
           <p>Количество инвестиций: {proposal.targetAmount} ETH</p>
