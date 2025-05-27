@@ -53,9 +53,20 @@ export default class SmartContract {
 
     async getCurrentVotings() {
         const result = await this.contract.getPastEvents("VotingStarted", {
+            filter: { votingStatus: "3" },
             fromBlock: 0,
             toBlock: "latest"
         })
+        console.log(result)
+        return result
+    }
+
+    async getAllVotings() {
+        const result = await this.contract.getPastEvents("VotingStarted", {
+            fromBlock: 0,
+            toBlock: "latest"
+        })
+        console.log(result)
         return result
     }
 
@@ -105,5 +116,12 @@ export default class SmartContract {
         await this.contract.methods
             .castVote(proposalId, support, tokenAmount)
             .send({ from: this.selectedAccount })
+    }
+
+    async getVotes(id) {
+        const result = await this.contract.methods
+            .votings(id)
+            .call()
+        return result
     }
 }

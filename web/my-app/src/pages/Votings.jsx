@@ -11,7 +11,7 @@ export default function Votings() {
 
   async function fetchVotingDetails() {
     let details = []
-    const currentVotings = await smartContract.getCurrentVotings()
+    const currentVotings = await smartContract.getAllVotings()
     for (let i = 0; i < currentVotings.length; i++) {
       details.push(currentVotings[i].returnValues);
     }
@@ -24,15 +24,16 @@ export default function Votings() {
       fetchVotingDetails()
     }
   }, [smartContract])
+  console.log(votings)
 
   return (
     <>
       <h1>Все голосования</h1>
       <h2>Все предложения вынесенные на голосование</h2>
       {
-        !votings == []
+        votings == []
           ? <h3> Нету голосований</h3>
-          : <AllCurrentVotings votings={votings} />
+          : <AllCurrentVotings votings={votings} showAll={true} />
       }
       <FetchAccounts />
       <GoBackButton />

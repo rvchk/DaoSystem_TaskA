@@ -7,11 +7,11 @@ import { GoBackButton } from "../components/goBackButton"
 
 export default function Voting() {
     const [selectedCheckbox, setSelectedCheckbox] = useState(true);
+    const [votingAmount, setVotingAmount] = useState(0)
     const [votings, setVotings] = useState()
     const { smartContract } = useData()
 
     const votingId = useRef()
-    const votingAmount = useRef()
 
     async function fetchVotingDetails() {
         let details = []
@@ -33,9 +33,9 @@ export default function Voting() {
         const result = await smartContract.castVote(
             votingId.current.value,
             selectedCheckbox,
-            votingAmount.current.value,
+            votingAmount,
         )
-        console.log(result)
+        alert("Вы проголосовали")
     }
 
     return (
@@ -43,14 +43,15 @@ export default function Voting() {
             <h1>Голосование</h1>
             <h2>Проголосовать</h2>
             <input type="number" placeholder="ID голосования" ref={votingId} />
-            <input type="number" placeholder="Сколько голосов" ref={votingAmount} />
+            <input type="number" placeholder="Сколько токенов" onChange={(e) => setVotingAmount(e.target.value)} />
+            <span>{(votingAmount / 3).toFixed(1)} Голосов</span>
             <div className="checkbox-block">
                 <div>
                     <input
                         type="checkbox"
                         id="checkbox-true"
                         checked={selectedCheckbox}
-                        onChange={() => setSelectedCheckbox(prev => false)}
+                        onChange={() => setSelectedCheckbox(true)}
                     />
                     <label htmlFor="checkbox-true" style={{ cursor: 'pointer' }}>За</label>
                 </div>
@@ -58,8 +59,8 @@ export default function Voting() {
                     <input
                         type="checkbox"
                         id="checkbox-false"
-                        checked={selectedCheckbox}
-                        onChange={() => setSelectedCheckbox(prev => !prev)}
+                        checked={!selectedCheckbox}
+                        onChange={() => setSelectedCheckbox(false)}
                     />
                     <label htmlFor="checkbox-false" style={{ cursor: 'pointer' }}>Против</label>
                 </div>

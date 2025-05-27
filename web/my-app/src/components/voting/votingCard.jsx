@@ -1,10 +1,11 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useData } from '../../data/DataProvider'
 
-export default function VotingCard({ voting }) {
+export default function VotingCard({ voting, showAll }) {
   const [name, setName] = useState()
   const [seconds, setSeconds] = useState("")
   const [minutes, setMinutes] = useState("")
+  const [votingInfo, setVotingInfo] = useState()
   const { smartContract } = useData()
 
   async function getUser() {
@@ -12,9 +13,24 @@ export default function VotingCard({ voting }) {
     setName(user.name)
   }
 
+  const votingStatus = [
+    "Ожидает начала",
+    "Не принято",
+    "Принято",
+    "Активно",
+    "Удалено",
+  ]
+
+  const getVotings = async () => {
+    const votingInfo = await smartContract.getVotes(voting.id)
+    console.log(votingInfo)
+    setVotingInfo(votingInfo)
+  }
+
   useEffect(() => {
     if (smartContract) {
       getUser()
+      getVotings()
     }
     const interval = setInterval(async () => {
       const time = Date.now();
@@ -25,6 +41,9 @@ export default function VotingCard({ voting }) {
         clearInterval(interval)
         setMinutes(0)
         setSeconds(0)
+        if (!showAll) {
+          setVotingInfo((prev) => prev.status = 1)
+        }
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -40,9 +59,9 @@ export default function VotingCard({ voting }) {
     alert("Адрес пользователя скопирован")
   }
 
-  return (
+  if (votingInfo?.status == 3) return (
     <div className='ProposalCard'>
-      <h3>Описание: {voting.description}</h3>
+      <h3>Описание: {votingInfo?.description}</h3>
       <p>
         ID голосования: {voting?.id.toString().slice(0, 8)}
         ...
@@ -51,9 +70,9 @@ export default function VotingCard({ voting }) {
 
       Создатель: <button className='copyButton' onClick={copyUserAddress}>{name}</button>
       <p>Выполнено: {voting?.executed ? "Да" : "Нет"}</p>
-      <p>Голоса за: {voting?.votesFor}</p>
-      <p>Голоса против: {voting?.votesFor}</p>
-      <p>Статус голосования: {voting?.votingStatus}</p>
+      <p>Голоса за: {votingInfo?.votesFor}</p>
+      <p>Голоса против: {votingInfo?.votesAgainst}</p>
+      <p>Статус голосования: {votingStatus[voting?.votingStatus]}</p>
 
       <div>
         <h3 style={{ marginTop: "15px" }}>Обратный таймер</h3>
