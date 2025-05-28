@@ -66,6 +66,30 @@ input {
   border: 1px solid black;
 }
 
+.userCard {
+  margin: 0 auto;
+  width: 400px;
+  padding: 10px;
+  margin-top: 50px;
+  margin-bottom: 30px;
+  border-radius: 15px;
+  box-shadow: 0px 5px 20px 5px rgb(216, 216, 216);
+  text-align: left;
+}
+
+.userCard img {
+  margin-inline: 10px;
+}
+
+.userCard h1 {
+  margin: 0px;
+}
+
+.userCard h2 {
+  margin-bottom: 5px;
+  font-size: 24px;
+}
+
 .AllVotings {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -201,6 +225,11 @@ input {
 
   .AllProposals {
     grid-template-columns: repeat(1, 1fr);
+  }
+
+  .userCard {
+    display: block;
+    text-align: center;
   }
 }
 

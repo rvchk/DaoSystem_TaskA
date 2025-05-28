@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { Button } from "react-bootstrap"
 import { Link, useNavigate } from "react-router-dom"
 
 export default function FetchAccounts() {
@@ -27,6 +28,6 @@ export default function FetchAccounts() {
     }
 
     return (
-        <button onClick={navigateToMain} className="fetchAccountsBar">Ровчак Матвей Сергеевич</button>
+        <Button variant="outline-secondary" onClick={navigateToMain} className="fetchAccountsBar">Ровчак Матвей Сергеевич</Button>
     )
 }

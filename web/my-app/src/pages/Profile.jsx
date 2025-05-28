@@ -2,10 +2,13 @@ import { useEffect, useRef, useState } from "react"
 import { useData } from "../data/DataProvider"
 import FetchAccounts from "../components/shared/FetchAccounts"
 import { GoBackButton } from "../components/shared/goBackButton"
+import Button from 'react-bootstrap/Button';
+import { Container, Form, Image, Stack } from "react-bootstrap";
 
 export default function Profile() {
   const wrapAmountRef = useRef()
   const { smartContract, selectedAccount, user } = useData()
+  const [selectedValue, setSelectedValue] = useState()
   const [profi, setProfi] = useState()
 
   useEffect(() => {
@@ -19,40 +22,43 @@ export default function Profile() {
     setProfi(profiBalance)
   }
 
-  async function changeProfiToWrap() {
-    const wrapAmount = wrapAmountRef.current.value
-    if (!wrapAmount) {
+  const buyWrap = async () => {
+    const amount = wrapAmountRef.current.value
+    if (!amount) {
       alert("Введите значение!")
       return
     }
-    const result = await smartContract.buyWrapTokensByProfi(wrapAmount)
-    location.reload()
-    return result
-  }
-
-  async function changeEthToWrap() {
-    const wrapAmount = wrapAmountRef.current.value
-    if (!wrapAmount) {
-      alert("Введите значение!")
-      return
+    
+    if (selectedValue == "eth") {
+      await smartContract.buyWrapTokensByEth(amount)
+      location.reload()
     }
-    const result = await smartContract.buyWrapTokensByEth(wrapAmount)
-    location.reload()
-    return result
+    else {
+      await smartContract.buyWrapTokensByProfi(amount)
+      location.reload()
+    }
   }
 
   return (
     <>
-      <h1>Профиль - {user?.name}</h1>
-      <h2>Статус: {user?.status == 1 ? "Участник DAO" : "Не участник DAO"} </h2>
-      <h2>Ваши Профи: {profi?.toString().slice(0, -12)}</h2>
-      <h2>Ваши wrap: {user?.wrapTokenBalance}</h2>
-      <h2>Купить wrap tokens</h2>
-      <div>
-        <input type="number" ref={wrapAmountRef} placeholder="Сколько wrap?" style={{ margin: "0 auto", marginBottom: "10px" }} />
-        <button onClick={changeProfiToWrap}>Купить за PROFI</button >
-        <button onClick={changeEthToWrap}>Купить за ETH</button >
-      </div>
+      <Stack direction="horizontal" className="userCard">
+        <Image src="/user.png" width={"150px"} />
+        <Container>
+          <h1>{user?.name}</h1>
+          <h2>{user?.status == 1 ? "Участник DAO" : "Не участник DAO"} </h2>
+          <h2>Профи: {profi?.toString().slice(0, -12)}</h2>
+          <h2>Врап: {user?.wrapTokenBalance}</h2>
+        </Container>
+      </Stack>
+      <h2>Купить врап токены</h2>
+      <Stack direction="horizontal" gap={3}>
+        <Form.Select aria-label="Default select example" onChange={(e) => setSelectedValue(e.target.value)}>
+          <option value="profi">За PROFI</option>
+          <option value="eth">За ETH</option>
+        </Form.Select>
+        <Form.Control className="me-auto" placeholder="Сколько врап?" ref={wrapAmountRef} />
+        <Button variant="secondary" onClick={buyWrap}>Купить</Button>
+      </Stack>
       <FetchAccounts />
       <GoBackButton />
     </>
