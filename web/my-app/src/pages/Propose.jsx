@@ -3,6 +3,7 @@ import { useData } from '../data/DataProvider'
 import AllUserProposals from '../components/proposal/AllUserProposals';
 import FetchAccounts from '../components/shared/FetchAccounts';
 import { GoBackButton } from '../components/shared/goBackButton';
+import Background from './Background';
 
 function Propose() {
   const { smartContract, selectedAccount, user } = useData()
@@ -135,6 +136,7 @@ function Propose() {
       }
       <FetchAccounts />
       <GoBackButton />
+      <Background />
     </>
   );
 }

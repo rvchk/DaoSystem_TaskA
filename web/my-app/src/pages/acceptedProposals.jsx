@@ -3,6 +3,7 @@ import { useData } from "../data/DataProvider"
 import AllCurrentVotings from "../components/voting/allCurrentVotings"
 import FetchAccounts from "../components/shared/FetchAccounts"
 import { GoBackButton } from "../components/shared/goBackButton"
+import Background from './Background';
 
 export default function AcceptedProposals() {
   const [votings, setVotings] = useState()
@@ -36,6 +37,7 @@ export default function AcceptedProposals() {
       }
       <FetchAccounts />
       <GoBackButton />
+      <Background />
     </>
   )
 }

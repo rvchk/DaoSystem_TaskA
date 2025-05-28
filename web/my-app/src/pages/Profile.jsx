@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { useData } from "../data/DataProvider"
 import FetchAccounts from "../components/shared/FetchAccounts"
 import { GoBackButton } from "../components/shared/goBackButton"
+import Background from './Background';
 
 export default function Profile() {
   const wrapAmountRef = useRef()
@@ -55,6 +56,7 @@ export default function Profile() {
       </div>
       <FetchAccounts />
       <GoBackButton />
+      <Background />
     </>
   )
 }

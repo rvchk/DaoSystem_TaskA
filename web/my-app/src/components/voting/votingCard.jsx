@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useData } from '../../data/DataProvider'
+import Background from '../../pages/Background';
 
 export default function VotingCard({ voting, showAll }) {
   const [name, setName] = useState()
@@ -83,6 +84,8 @@ export default function VotingCard({ voting, showAll }) {
           <p>{`${minutes ? minutes + ":" : ""}${seconds < 10 ? '0' : ''}${seconds}`}</p>
         )}
       </div>
+      <Background />
     </div >
+    
   )
 }
