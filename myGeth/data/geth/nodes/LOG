@@ -1,0 +1,38 @@
+=============== May 27, 2025 (MSK) ===============
+16:23:26.143606 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:23:26.147319 db@open opening
+16:23:26.147843 version@stat F·[] S·0B[] Sc·[]
+16:23:26.148924 db@janitor F·2 G·0
+16:23:26.149894 db@open done T·2.5753ms
+21:48:30.088768 db@close closing
+21:48:30.090004 db@close done T·1.2352ms
+=============== May 27, 2025 (MSK) ===============
+21:48:31.820679 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+21:48:31.823929 version@stat F·[] S·0B[] Sc·[]
+21:48:31.823929 db@open opening
+21:48:31.823929 journal@recovery F·1
+21:48:31.828425 journal@recovery recovering @1
+21:48:31.843963 memdb@flush created L0@2 N·2 S·181B "loc..seq,v2":"version,v1"
+21:48:31.844953 version@stat F·[1] S·181B[181B] Sc·[0.25]
+21:48:31.851536 db@janitor F·3 G·0
+21:48:31.851536 db@open done T·27.6076ms
+22:38:11.720940 db@close closing
+22:38:11.721453 db@close done T·512.6µs
+=============== May 28, 2025 (MSK) ===============
+17:07:13.512270 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+17:07:13.515270 version@stat F·[1] S·181B[181B] Sc·[0.25]
+17:07:13.515270 db@open opening
+17:07:13.516273 journal@recovery F·2
+17:07:13.521274 journal@recovery recovering @3
+17:07:13.524796 journal@recovery recovering @103
+17:07:13.529108 memdb@flush created L0@104 N·1 S·162B "loc..seq,v4":"loc..seq,v4"
+17:07:13.529108 version@stat F·[2] S·343B[343B] Sc·[0.50]
+17:07:13.536494 memdb@flush created L0@106 N·1 S·162B "loc..seq,v66":"loc..seq,v66"
+17:07:13.538759 version@stat F·[3] S·505B[505B] Sc·[0.75]
+17:07:13.540855 db@janitor F·8 G·3
+17:07:13.540855 db@janitor removing table-102
+17:07:13.540855 db@janitor removing table-105
+17:07:13.540855 db@janitor removing manifest-104
+17:07:13.540855 db@open done T·25.5847ms
+20:14:37.953856 db@close closing
+20:14:37.954427 db@close done T·571µs
