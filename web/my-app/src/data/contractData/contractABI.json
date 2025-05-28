@@ -662,6 +662,12 @@
 				"internalType": "enum DaoSystem.VotingStatus",
 				"name": "votingStatus",
 				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
 			}
 		],
 		"name": "VotingStarted",
@@ -1030,6 +1036,19 @@
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			}
+		],
+		"name": "deleteProposal",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "eip712Domain",
 		"outputs": [
@@ -1133,67 +1152,6 @@
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "proposalId",
-				"type": "uint256"
-			}
-		],
-		"name": "getProposal",
-		"outputs": [
-			{
-				"components": [
-					{
-						"internalType": "uint256",
-						"name": "id",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "proposer",
-						"type": "address"
-					},
-					{
-						"internalType": "string",
-						"name": "description",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "votingId",
-						"type": "uint256"
-					},
-					{
-						"internalType": "bool",
-						"name": "executed",
-						"type": "bool"
-					},
-					{
-						"internalType": "enum DaoSystem.ProposalType",
-						"name": "proposalType",
-						"type": "uint8"
-					},
-					{
-						"internalType": "address",
-						"name": "targetAddress",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "targetAmount",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct DaoSystem.Proposal",
-				"name": "",
-				"type": "tuple"
 			}
 		],
 		"stateMutability": "view",
@@ -1654,6 +1612,11 @@
 			{
 				"internalType": "bool",
 				"name": "executed",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "onVoting",
 				"type": "bool"
 			},
 			{

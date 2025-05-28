@@ -74,22 +74,60 @@ input {
 
 .AllProposals {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
+@media (max-width: 1200px) {
+  .AllProposals {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .ProposalCard {
+  text-align: left;
   display: block;
   width: 400px;
   background-color: rgb(233, 231, 231);
   border-radius: 20px;
-  height: 400px;
+  height: 300px;
   padding: 15px;
   margin-inline: 10px;
+  position: relative;
+  transition: all ease 200ms;
+}
+
+.ProposalCard {
+  opacity: 100;
+}
+
+.ProposalCard h3 {
+  font-size: 20px;
+  text-align: center;
 }
 
 .ProposalCard p {
-  margin-top: 10px;
+  margin-bottom: 5px;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.ProposalCard div {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.deleteIcon img {
+  width: 30px;
+  height: 30px;
+}
+
+.deleteIcon {
+  padding: 0px;
+  position: absolute;
+  margin: 5px;
+  right: 0;
+  top: 0;
 }
 
 .userInfoBlock {
@@ -159,6 +197,10 @@ input {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+  }
+
+  .AllProposals {
+    grid-template-columns: repeat(1, 1fr);
   }
 }
 

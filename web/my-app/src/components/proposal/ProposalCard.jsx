@@ -5,6 +5,7 @@ import { useData } from '../../data/DataProvider'
 export default function ProposalCard({ proposal }) {
   const { smartContract } = useData()
   const [name, setName] = useState()
+  const [proposalInfo, setProposalInfo] = useState()
   const copyProposeId = () => {
     navigator.clipboard.writeText(proposal.id)
     alert("ID предложения скопирован")
@@ -15,31 +16,52 @@ export default function ProposalCard({ proposal }) {
     setName(user.name)
   }
 
+  const getProposalInfo = async () => {
+    const proposalInfo = await smartContract.getProposalInfo(proposal.id)
+    setProposalInfo(proposalInfo)
+  }
+
+  const deleteProposal = async () => {
+    await smartContract.deleteProposal(proposal.id)
+    getProposalInfo()
+  }
+
   const proposalTypes = [
-    "Новые инвестиции",
+    "Добавление новых инвестиций",
     "Добавление инвестиций",
-    "Добавить пользователя",
-    "Исключить пользователя",
-    "Изменить токен wrap"
+    "Добавление пользователя",
+    "Исключение пользователя",
+    "Изменение токена Wrap"
   ]
 
   useEffect(() => {
     if (smartContract) {
       getUserName()
+      getProposalInfo()
     }
   }, [smartContract])
 
   return (
-    <div className='ProposalCard'>
-      <h3>Описание: {proposal.description}</h3>
-      <span>
-        ID предложения: {proposal.id.toString().slice(0, 8)}...
-        <a onClick={copyProposeId} className='copyButton'>Копировать</a>
-      </span>
-      <p>Создатель: {name}</p>
-      <p>Выполнено: {proposal.executed ? "Да" : "Нет"}</p>
-      <p>Тип предложения: {proposalTypes[proposal.proposalType]}</p>
-      <ProposalDetails proposal={proposal} />
-    </div>
+    <>
+      {proposalInfo?.votingId != 0 && (
+        <div className='ProposalCard'>
+          <button className='deleteIcon' onClick={deleteProposal}>
+            <img src="/delete-icon.png" alt="#" />
+          </button>
+          <h3>{proposalTypes[proposal.proposalType]}</h3>
+          <p>Описание: {proposal.description}</p>
+          {proposalInfo?.onVoting && <p>На голосовании</p>}
+          {proposal.executed && <p>Выполнено</p>}
+          <span>
+            ID: {proposal.id.toString().slice(0, 8)}...
+            <a onClick={copyProposeId} className='copyButton'>Копировать</a>
+          </span>
+          <div>
+            <p>Создатель: <strong>{name}</strong></p>
+          </div>
+          <ProposalDetails proposal={proposal} />
+        </div>
+      )}
+    </>
   )
 }

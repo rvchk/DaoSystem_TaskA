@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react"
 import { useData } from "../data/DataProvider"
-import { UserInfo } from "../components/userInfo"
+import { UserInfo } from "../components/shared/userInfo"
 import AllCurrentVotings from "../components/voting/allCurrentVotings"
-import FetchAccounts from "../components/FetchAccounts"
-import { GoBackButton } from "../components/goBackButton"
+import FetchAccounts from "../components/shared/FetchAccounts"
+import { GoBackButton } from "../components/shared/goBackButton"
 
 export default function Voting() {
     const [selectedCheckbox, setSelectedCheckbox] = useState(true);
@@ -30,7 +30,7 @@ export default function Voting() {
     }, [smartContract])
 
     const sendVote = async () => {
-        const result = await smartContract.castVote(
+        await smartContract.castVote(
             votingId.current.value,
             selectedCheckbox,
             votingAmount,

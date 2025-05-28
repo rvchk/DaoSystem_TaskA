@@ -32,6 +32,7 @@ export default function VotingCard({ voting, showAll }) {
       getUser()
       getVotings()
     }
+
     const interval = setInterval(async () => {
       const time = Date.now();
       let timeLeft = String(voting.endTime) - time.toString().slice(0, 10)

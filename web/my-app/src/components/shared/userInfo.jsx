@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useData } from "../data/DataProvider"
+import { useData } from "../../data/DataProvider"
 import { Link } from "react-router-dom"
 
 export const UserInfo = () => {

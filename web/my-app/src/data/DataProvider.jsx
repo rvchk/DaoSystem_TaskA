@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react"
-import contractABI from "../contractData/contractABI.json"
-import { byteCode } from "../contractData/byteCode"
+import contractABI from "./contractData/contractABI.json"
+import { byteCode } from "./contractData/byteCode"
 import SmartContract from "../transactions/SmartContract"
 import Web3 from "web3"
 const DataContext = createContext()

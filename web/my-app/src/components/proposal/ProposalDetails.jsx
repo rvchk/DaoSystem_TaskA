@@ -9,6 +9,11 @@ export const ProposalDetails = ({ proposal }) => {
     setUser(user)
   }
 
+  const copyUserAddress = () => {
+    navigator.clipboard.writeText(proposal.targetAddress)
+    alert("Адрес пользователя скопирован")
+  }
+
   useEffect(() => {
     if (smartContract) {
       getUser()
@@ -19,20 +24,26 @@ export const ProposalDetails = ({ proposal }) => {
     <div className="proposal-details">
       {(proposal.proposalType == "0" || proposal.proposalType == "1") && (
         <div>
-          <p>Адрес стартапа: {proposal.targetAddress}</p>
           <p>Количество инвестиций: {proposal.targetAmount} ETH</p>
+          <span>
+            Адрес: {proposal.targetAddress.toString().slice(0, 8)}...
+            <a onClick={copyUserAddress} className='copyButton'>Копировать</a>
+          </span>
         </div>
       )}
       {proposal.proposalType == "2" || proposal.proposalType == "3" && (
         <>
-          <p>Адрес пользователя: {proposal.targetAddress}</p>
-          <p>Имя пользователя: {user?.name}</p>
+          <p>Имя пользователя: <strong>{user?.name}</strong></p>
+          <span>
+            Адрес: {proposal.targetAddress.toString().slice(0, 8)}...
+            <a onClick={copyUserAddress} className='copyButton'>Копировать</a>
+          </span>
         </>
       )}
       {proposal.proposalType == "4" && (
         <div>
           <p>Адрес токена: {proposal.targetAddress}</p>
-          <p>Новая цена: {proposal.targetAmount}</p>
+          <p>Новая цена: <strong>{proposal.targetAmount}</strong></p>
         </div>
       )}
     </div>

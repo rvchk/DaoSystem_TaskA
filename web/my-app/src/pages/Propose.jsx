@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { useData } from '../data/DataProvider'
 import AllUserProposals from '../components/proposal/AllUserProposals';
-import { useNavigate } from 'react-router-dom';
-import FetchAccounts from '../components/FetchAccounts';
-import { GoBackButton } from '../components/goBackButton';
+import FetchAccounts from '../components/shared/FetchAccounts';
+import { GoBackButton } from '../components/shared/goBackButton';
 
 function Propose() {
   const { smartContract, selectedAccount, user } = useData()
@@ -24,14 +23,13 @@ function Propose() {
   }, [smartContract, selectedAccount])
 
   async function fetchProposalDetails() {
-    let details = []
+    let currentProposals = []
     const pastProposals = await smartContract.getUserPastProposals()
     for (let i = 0; i < pastProposals.length; i++) {
-      details.push(pastProposals[i].returnValues);
+      currentProposals.push(await smartContract.getProposalInfo(pastProposals[i].returnValues.id))
     }
-    console.log(details)
-    setUserProposals(details)
-    return details;
+    const filteredProposals = currentProposals.filter(proposal => proposal.id != 0)
+    setUserProposals(filteredProposals)
   }
 
   function timeToSeconds(timeString) {

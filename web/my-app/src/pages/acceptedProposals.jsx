@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react"
 import { useData } from "../data/DataProvider"
-import { UserInfo } from "../components/userInfo"
 import AllCurrentVotings from "../components/voting/allCurrentVotings"
-import FetchAccounts from "../components/FetchAccounts"
-import { GoBackButton } from "../components/goBackButton"
+import FetchAccounts from "../components/shared/FetchAccounts"
+import { GoBackButton } from "../components/shared/goBackButton"
 
-export default function Votings() {
+export default function AcceptedProposals() {
   const [votings, setVotings] = useState()
   const { smartContract } = useData()
 
@@ -15,7 +14,7 @@ export default function Votings() {
     for (let i = 0; i < currentVotings.length; i++) {
       details.push(currentVotings[i].returnValues);
     }
-    setVotings(details)
+    setVotings(details.filter(item => item.status == "APPROVED"))
     return details;
   }
 

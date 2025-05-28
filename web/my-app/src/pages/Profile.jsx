@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useData } from "../data/DataProvider"
-import FetchAccounts from "../components/FetchAccounts"
-import { GoBackButton } from "../components/goBackButton"
+import FetchAccounts from "../components/shared/FetchAccounts"
+import { GoBackButton } from "../components/shared/goBackButton"
 
 export default function Profile() {
   const wrapAmountRef = useRef()

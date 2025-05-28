@@ -124,4 +124,18 @@ export default class SmartContract {
             .call()
         return result
     }
+
+    async getProposalInfo(id) {
+        const result = await this.contract.methods
+            .proposals(id)
+            .call()
+        return result
+    }
+
+    async deleteProposal(id) {
+        await this.contract.methods
+            .deleteProposal(id)
+            .send({ from: this.selectedAccount })
+        console.log("Предложение удалено")
+    }
 }
