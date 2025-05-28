@@ -1,0 +1,78 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"details": "Helper library for emitting standardized panic codes. ```solidity contract Example {      using Panic for uint256;      // Use any of the declared internal constants      function foo() { Panic.GENERIC.panic(); }      // Alternatively      function foo() { Panic.panic(Panic.GENERIC); } } ``` Follows the list from https://github.com/ethereum/solidity/blob/v0.8.24/libsolutil/ErrorCodes.h[libsolutil]. _Available since v5.1._",
+			"kind": "dev",
+			"methods": {},
+			"stateVariables": {
+				"ARRAY_OUT_OF_BOUNDS": {
+					"details": "array out of bounds access"
+				},
+				"ASSERT": {
+					"details": "used by the assert() builtin"
+				},
+				"DIVISION_BY_ZERO": {
+					"details": "division or modulo by zero"
+				},
+				"EMPTY_ARRAY_POP": {
+					"details": "empty array pop"
+				},
+				"ENUM_CONVERSION_ERROR": {
+					"details": "enum conversion error"
+				},
+				"GENERIC": {
+					"details": "generic / unspecified error"
+				},
+				"INVALID_INTERNAL_FUNCTION": {
+					"details": "calling invalid internal function"
+				},
+				"RESOURCE_ERROR": {
+					"details": "resource error (too large allocation or too large array)"
+				},
+				"STORAGE_ENCODING_ERROR": {
+					"details": "invalid encoding in storage"
+				},
+				"UNDER_OVERFLOW": {
+					"details": "arithmetic underflow or overflow"
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"GovernanceBundle.sol": "Panic"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"GovernanceBundle.sol": {
+			"keccak256": "0xfdb0b9d850e1566f522587fde3d72e45c30bd67aeaae8fd5e49c5958502008ae",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://3aea5b29132713e5760a770a925f88e6c419d95285834e77e4c3f3d9dcc8e528",
+				"dweb:/ipfs/QmTtNTUgL6bA3Up4xyiAEkctKEBTCSA4vUfXhpV3qn4Ytd"
+			]
+		}
+	},
+	"version": 1
+}

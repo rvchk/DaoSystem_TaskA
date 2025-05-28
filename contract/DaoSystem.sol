@@ -9,7 +9,7 @@ contract DaoSystem is Governor {
     address internal Ben = 0xa0Fddc85DA6Fbe53D2e7d55cbDa9a22c3620816C;
     address internal Rick = 0x58E4a1126170CfA7CCF016a9362AE1a9f1c70914;
     address internal Jack = 0xB6458438e80Ad9bd3DD3DdB5FB1942a139C1ffD3;
-    address internal Fond = 0x812F7c9C267B3B24fC81d8f6CDdb9482D2b992df;
+   address internal Fond = 0x812F7c9C267B3B24fC81d8f6CDdb9482D2b992df;
 
     Token internal Professional;
     Token internal RTKCoin;
