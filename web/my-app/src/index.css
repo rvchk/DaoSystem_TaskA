@@ -6,22 +6,21 @@
 
 body {
   margin: 0 auto;
-  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
   display: flex;
   justify-content: center;
-  place-items: center;
-  font-family: Arial, Helvetica, sans-serif;
+  align-items: center;
+  min-height: 100vh;
+  text-align: center;
 }
 
 h1 {
   font-size: 3.2em;
-  margin-bottom: 30px;
-  margin-top: 20px;
+  margin: 20px 0 30px;
 }
 
 h2 {
-  margin-bottom: 20px;
-  margin-top: 10px;
+  margin: 10px 0 20px;
 }
 
 h3 {
@@ -32,49 +31,47 @@ a {
   text-decoration: none;
 }
 
-button {
+button,
+select {
+  font: inherit;
+  font-size: 1em;
+  padding: 0.6em 1.2em;
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
   background-color: #e6e6e6;
   cursor: pointer;
-  transition: ease all 200ms;
+  transition: all 200ms ease;
 }
 
-button:hover {
+button:hover,
+.backButton:hover {
   background-color: #d3d3d3;
 }
 
 select {
-  padding: 5px;
   font-size: 14px;
-  border-radius: 8px;
+  padding: 5px;
 }
 
-input {
+input[type="text"],
+input[type="number"] {
   width: 200px;
   display: block;
-  margin: 0 auto;
-  margin-top: 5px;
-  margin-bottom: 5px;
+  margin: 5px auto;
   padding: 10px;
   font-size: 14px;
-  border-radius: 10px;
   border: 1px solid black;
+  border-radius: 10px;
 }
 
 .userCard {
-  margin: 0 auto;
   width: 400px;
+  margin: 50px auto 30px;
   padding: 10px;
-  margin-top: 50px;
-  margin-bottom: 30px;
   border-radius: 15px;
   box-shadow: 0px 5px 20px 5px rgb(216, 216, 216);
   text-align: left;
+  position: relative;
 }
 
 .userCard img {
@@ -82,7 +79,7 @@ input {
 }
 
 .userCard h1 {
-  margin: 0px;
+  margin: 0;
 }
 
 .userCard h2 {
@@ -102,27 +99,17 @@ input {
   gap: 16px;
 }
 
-@media (max-width: 1200px) {
-  .AllProposals {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 .ProposalCard {
-  text-align: left;
   display: block;
   width: 400px;
-  background-color: rgb(233, 231, 231);
-  border-radius: 20px;
   height: 300px;
   padding: 15px;
   margin-inline: 10px;
+  background-color: rgb(233, 231, 231);
+  border-radius: 20px;
   position: relative;
-  transition: all ease 200ms;
-}
-
-.ProposalCard {
-  opacity: 100;
+  transition: all 200ms ease;
+  opacity: 1;
 }
 
 .ProposalCard h3 {
@@ -137,8 +124,14 @@ input {
 }
 
 .ProposalCard div {
-  margin-bottom: 20px;
-  margin-top: 20px;
+  margin: 20px 0;
+}
+
+.deleteIcon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 0;
 }
 
 .deleteIcon img {
@@ -146,40 +139,24 @@ input {
   height: 30px;
 }
 
-.deleteIcon {
-  padding: 0px;
-  position: absolute;
-  margin: 5px;
-  right: 0;
-  top: 0;
-}
-
 .userInfoBlock {
-  display: flex;
   position: absolute;
-  right: 0;
-  top: 0;
-  margin: 10px;
-  border-radius: 15px;
+  top: 10px;
+  right: 10px;
   padding: 8px;
+  border-radius: 15px;
   box-shadow: 0px 5px 20px 5px rgb(216, 216, 216);
 }
 
 .backButton {
-  display: flex;
   position: absolute;
-  left: 0;
-  top: 0;
-  margin: 10px;
-  border-radius: 15px;
+  top: 20px;
+  left: 10px;
   padding: 8px;
+  border-radius: 15px;
   box-shadow: 0px 5px 15px 5px rgb(216, 216, 216);
   background-color: white;
-  margin-top: 20px;
-}
-
-.backButton:hover {
-  background-color: rgb(235, 235, 235);
+  transition: background-color 200ms ease;
 }
 
 .backButton img {
@@ -190,7 +167,7 @@ input {
 .userInfoName {
   color: black;
   font-size: 20px;
-  transition: ease all 100ms;
+  transition: transform 100ms ease;
   margin-top: 10px;
 }
 
@@ -200,8 +177,7 @@ input {
 
 .userInfoBalances p {
   text-align: left;
-  margin: 5px;
-  margin-left: 10px;
+  margin: 5px 0 0 10px;
 }
 
 .card {
@@ -214,6 +190,79 @@ input {
 
 .links {
   margin-bottom: 20px;
+}
+
+.routeLink {
+  display: inline-block;
+  padding: 10px;
+  margin: 0 10px;
+  color: black;
+  background-color: #e6e6e6;
+  border-radius: 8px;
+  transition: background-color 200ms ease;
+}
+
+.routeLink:hover {
+  background-color: #d3d3d3;
+}
+
+.creator {
+  color: black;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 5px;
+  width: 300px;
+  margin: 20px auto 0;
+}
+
+.copyButton {
+  cursor: pointer;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: rgb(211, 211, 211);
+  margin-left: 5px;
+  transition: background-color 200ms ease;
+}
+
+.copyButton:hover {
+  background-color: rgb(190, 190, 190);
+}
+
+.fetchAccountsBar {
+  display: block;
+  margin: 30px auto 0;
+}
+
+#checkbox-true,
+#checkbox-false {
+  width: 25px;
+}
+
+.checkbox-block {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.checkbox-block div {
+  width: 100px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.checkbox-block label {
+  padding-right: 20px;
+}
+
+.checkbox-block input {
+  display: inline;
+}
+
+/* Media Queries */
+@media (max-width: 1200px) {
+  .AllProposals {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 650px) {
@@ -231,70 +280,4 @@ input {
     display: block;
     text-align: center;
   }
-}
-
-.routeLink {
-  padding: 10px;
-  border-radius: 8px;
-  color: rgb(0, 0, 0);
-  background-color: #e6e6e6;
-  margin-inline: 10px;
-  transition: ease all 200ms;
-}
-
-.routeLink:hover {
-  background-color: #d3d3d3;
-}
-
-.creator {
-  color: black;
-  border: solid 1px black;
-  border-radius: 10px;
-  padding: 5px;
-  width: 300px;
-  margin: 0 auto;
-  margin-top: 20px;
-}
-
-.copyButton {
-  cursor: pointer;
-  border-radius: 5px;
-  padding: 5px;
-  background-color: rgb(211, 211, 211);
-  margin-left: 5px;
-  transition: ease all 200ms;
-}
-
-.copyButton:hover {
-  background-color: rgb(190, 190, 190);
-}
-
-.fetchAccountsBar {
-  margin: 0 auto;
-  margin-top: 30px;
-  display: block;
-}
-
-#checkbox-true,
-#checkbox-false {
-  width: 25px;
-}
-
-.checkbox-block {
-  display: "flex";
-  margin-bottom: 15px;
-}
-
-.checkbox-block div {
-  width: 100px;
-  margin: 0 auto;
-  text-align: left;
-}
-
-.checkbox-block label {
-  padding-right: 20px;
-}
-
-.checkbox-block input {
-  display: inline;
 }
