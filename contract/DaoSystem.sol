@@ -69,7 +69,6 @@ contract DaoSystem is Governor {
         QuorumType quorumType;
         uint256 votesFor;
         uint256 votesAgainst;
-        uint256 totalVotes;
         address[] voters;
     }
 
@@ -88,6 +87,7 @@ contract DaoSystem is Governor {
         string description;
         uint256 votingId;
         bool executed;
+        bool onVoting;
         ProposalType proposalType;
         address targetAddress;
         uint256 targetAmount;
@@ -100,7 +100,6 @@ contract DaoSystem is Governor {
     event ProposalExecuted(uint256 indexed proposalId, VotingStatus indexed status);
     event NewStartupInvestment(address indexed startup, uint256 amount);
     event StartupInvestment(address indexed startup, uint256 amount);
-    event VotingCancelled(uint256 indexed id);
 
     // Данные
     mapping(uint256 => mapping(address => VoteSupport)) public voteSupports;
@@ -232,6 +231,7 @@ contract DaoSystem is Governor {
             description: description,
             votingId: proposalId, // В Governor proposalId == votingId
             executed: false,
+            onVoting: false,
             targetAddress: targetAddress,
             targetAmount: targetAmount
         });
@@ -245,7 +245,6 @@ contract DaoSystem is Governor {
             quorumType: quorumType,
             votesFor: 0,
             votesAgainst: 0,
-            totalVotes: 0,
             voters: new address[](0) // Инициализация пустого массива voters
         });  
 
@@ -253,22 +252,18 @@ contract DaoSystem is Governor {
         return proposalId;
     }
 
-    function getProposal(uint256 proposalId) public view returns(Proposal memory) {
-        return proposals[proposalId];
-    }
-
-    function checkVotingRequires(Voting memory voting) internal view {
-        require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
-        require(block.timestamp <= voting.endTime, "Voting period has ended");
+    function deleteProposal(uint256 id) public {
+        delete proposals[id];
     }
 
     // Функция для начала голосования по предложению
     function startVoting(uint256 proposalId, uint256 timeForVoting) public {
         Proposal storage proposal = proposals[proposalId];
+        proposal.onVoting = true;
         require(proposal.proposer == msg.sender, "Only proposer can start voting");
         require(votings[proposal.votingId].startTime == 0, "Voting already started");
 
-        Voting storage voting = votings[proposal.votingId];
+        Voting storage voting = votings[proposalId];
         voting.startTime = block.timestamp; // Set startTime to current timestamp
         voting.endTime = block.timestamp + timeForVoting; // Set endTime
         voting.status = VotingStatus.ACTIVE; // Update status to ACTIVE
@@ -280,9 +275,8 @@ contract DaoSystem is Governor {
     function castVote(uint256 proposalId, bool support, uint256 tokenAmount) public onlyMember {
         Voting storage voting = votings[proposalId];
 
-        checkVotingRequires(voting);
+        require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
         require(!hasVoted(proposalId, msg.sender), "Already voted");
-        require(proposals[proposalId].proposer != msg.sender, "Can't vote by yourself");
 
         // Определяем вес голоса
         uint256 votingPower;
@@ -310,7 +304,7 @@ contract DaoSystem is Governor {
     function supportVote(uint256 proposalId, address voter, uint256 wrapTokenAmount) public {
         Voting storage voting = votings[proposalId];
 
-        checkVotingRequires(voting);
+        require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
 
         // Проверяем, что адрес, который поддерживают, уже проголосовал
         uint256 voterWeight = votes[proposalId][voter];
@@ -334,9 +328,6 @@ contract DaoSystem is Governor {
             voting.votesAgainst += additionalVotes;
         }
 
-        // Увеличиваем общий счетчик голосов
-        voting.totalVotes += additionalVotes;
-
         // Записываем данные о поддержке
         voteSupports[proposalId][msg.sender] = VoteSupport({
             proposalId: proposalId,
@@ -351,9 +342,9 @@ contract DaoSystem is Governor {
     // Функция для отмены голосования
     function cancelVoting(uint256 proposalId) public onlyMember {
         Voting storage voting = votings[proposalId];
-        checkVotingRequires(voting);
+        require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
         require(msg.sender == voting.initiator, "Only initiator can cancel");
-        
+
         // Возвращаем токены всем проголосовавшим участникам
         for (uint i = 0; i < voting.voters.length; i++) {
             address voter = voting.voters[i];
@@ -370,34 +361,28 @@ contract DaoSystem is Governor {
                 );
             }
         }
-        
-        // Очищаем список проголосовавших
-        delete voting.voters;
-        
+    
         // Меняем статус голосования
         voting.status = VotingStatus.DELETED;
-        
-        emit VotingCancelled(proposalId);
+        proposals[proposalId].onVoting = false;        
     }
 
     // Функция для завершения голосования и выполнения предложения
     function executeProposal(uint256 proposalId) public {
         Proposal storage proposal = proposals[proposalId];
-        Voting storage voting = votings[proposal.votingId];
+        Voting storage voting = votings[proposalId];
         
-        checkVotingRequires(voting);
+        require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
         require(!proposal.executed, "Proposal already executed");
-        require(block.timestamp > voting.endTime, "Voting is still ongoing");
         
         if (quorumReached(proposalId) && _voteSucceeded(proposalId)) {
             voting.status = VotingStatus.APPROVED;
             proposal.executed = true;
             _executeProposal(proposalId);
+            emit ProposalExecuted(proposalId, voting.status);
         } else {
             voting.status = VotingStatus.REJECTED;
         }
-        
-        emit ProposalExecuted(proposalId, voting.status);
     }
 
     // Внутренняя функция выполнения предложения
@@ -494,7 +479,6 @@ contract DaoSystem is Governor {
             voting.votesAgainst += weight / 3;
         }
         
-        voting.totalVotes += weight;
         votes[proposalId][account] = weight;
         
         return weight;
