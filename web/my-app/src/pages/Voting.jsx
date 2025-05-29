@@ -4,6 +4,7 @@ import { UserInfo } from "../components/shared/userInfo"
 import AllCurrentVotings from "../components/voting/allCurrentVotings"
 import FetchAccounts from "../components/shared/FetchAccounts"
 import { GoBackButton } from "../components/shared/goBackButton"
+import { Button } from "react-bootstrap"
 
 export default function Voting() {
     const [selectedCheckbox, setSelectedCheckbox] = useState(true);
@@ -35,7 +36,6 @@ export default function Voting() {
             selectedCheckbox,
             votingAmount,
         )
-        alert("Вы проголосовали")
     }
 
     return (

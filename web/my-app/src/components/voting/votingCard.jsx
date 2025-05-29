@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useData } from '../../data/DataProvider'
+import { Button } from 'react-bootstrap'
 
 export default function VotingCard({ voting, showAll }) {
   const [name, setName] = useState()
@@ -27,6 +28,10 @@ export default function VotingCard({ voting, showAll }) {
     setVotingInfo(votingInfo)
   }
 
+  async function test() {
+    await smartContract.executeProposal(voting.id, voting.initiator)
+  }
+
   useEffect(() => {
     if (smartContract) {
       getUser()
@@ -42,9 +47,9 @@ export default function VotingCard({ voting, showAll }) {
         clearInterval(interval)
         setMinutes(0)
         setSeconds(0)
-        if (!showAll) {
-          setVotingInfo((prev) => prev.status = 1)
-        }
+        // if (!showAll) {
+        //   setVotingInfo((prev) => prev.status = 1)
+        // }
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -62,6 +67,7 @@ export default function VotingCard({ voting, showAll }) {
 
   if (votingInfo?.status == 3) return (
     <div className='ProposalCard'>
+      <Button variant="secondary" onClick={test}>Инициализировать</Button>
       <h3>Описание: {votingInfo?.description}</h3>
       <p>
         ID голосования: {voting?.id.toString().slice(0, 8)}

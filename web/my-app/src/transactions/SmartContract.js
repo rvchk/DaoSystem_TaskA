@@ -57,12 +57,29 @@ export default class SmartContract {
             fromBlock: 0,
             toBlock: "latest"
         })
-        console.log(result)
         return result
     }
 
     async getAllVotings() {
         const result = await this.contract.getPastEvents("VotingStarted", {
+            fromBlock: 0,
+            toBlock: "latest"
+        })
+        console.log(result)
+        return result
+    }
+
+    async getInvestment() {
+        const result = await this.contract.getPastEvents("NewStartupInvestment", {
+            fromBlock: 0,
+            toBlock: "latest"
+        })
+        console.log(result)
+        return result
+    }
+
+    async getAcceptedProposals() {
+        const result = await this.contract.getPastEvents("ProposalExecuted", {
             fromBlock: 0,
             toBlock: "latest"
         })
@@ -137,5 +154,11 @@ export default class SmartContract {
             .deleteProposal(id)
             .send({ from: this.selectedAccount })
         console.log("Предложение удалено")
+    }
+
+    async executeProposal(id, creator) {
+        await this.contract.methods
+            .executeProposal(id)
+            .send({ from: creator })
     }
 }

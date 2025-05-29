@@ -613,19 +613,6 @@
 				"internalType": "uint256",
 				"name": "id",
 				"type": "uint256"
-			}
-		],
-		"name": "VotingCancelled",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "uint256",
-				"name": "id",
-				"type": "uint256"
 			},
 			{
 				"indexed": false,
