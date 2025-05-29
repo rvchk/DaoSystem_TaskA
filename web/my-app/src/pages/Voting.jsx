@@ -4,7 +4,7 @@ import { UserInfo } from "../components/shared/userInfo"
 import AllCurrentVotings from "../components/voting/allCurrentVotings"
 import FetchAccounts from "../components/shared/FetchAccounts"
 import { GoBackButton } from "../components/shared/goBackButton"
-import { Button } from "react-bootstrap"
+import { Button, Form, FormControl, InputGroup, Stack } from "react-bootstrap"
 
 export default function Voting() {
     const [selectedCheckbox, setSelectedCheckbox] = useState(true);
@@ -39,39 +39,27 @@ export default function Voting() {
     }
 
     return (
-        <>
-            <h1>Голосование</h1>
-            <h2>Проголосовать</h2>
-            <input type="number" placeholder="ID голосования" ref={votingId} />
-            <input type="number" placeholder="Сколько токенов" onChange={(e) => setVotingAmount(e.target.value)} />
-            <span>{(votingAmount / 3).toFixed(1)} Голосов</span>
-            <div className="checkbox-block">
-                <div>
-                    <input
-                        type="checkbox"
-                        id="checkbox-true"
-                        checked={selectedCheckbox}
-                        onChange={() => setSelectedCheckbox(true)}
-                    />
-                    <label htmlFor="checkbox-true" style={{ cursor: 'pointer' }}>За</label>
-                </div>
-                <div>
-                    <input
-                        type="checkbox"
-                        id="checkbox-false"
-                        checked={!selectedCheckbox}
-                        onChange={() => setSelectedCheckbox(false)}
-                    />
-                    <label htmlFor="checkbox-false" style={{ cursor: 'pointer' }}>Против</label>
-                </div>
-            </div>
-            <button onClick={sendVote}>Проголосовать</button>
+      <>
+        <h1>Голосование</h1>
+        <h2>Проголосовать</h2>
+        <input type="number" placeholder="ID голосования" ref={votingId} />
+        <Stack direction="horizontal">
+            <Form.Select style={{ width: '100px' }} className="flex-shrink-0">
+                <option value="profi">PROFI</option>
+                <option value="wrap">WRAP</option>
+            </Form.Select>
+            <Form.Control type="text" placeholder="Введите значение" className="rounded-start-0" />
+        </Stack>
+        <Stack direction="horizontal" gap={3} style={{justifyContent: "center"}}>
+            <Button variant="secondary" onClick={sendVote}>Голосовать за</Button>
+            <Button variant="secondary" onClick={sendVote}>Голосовать против</Button>
+        </Stack>
 
-            <h2>Все предложения на голосовании</h2>
-            <AllCurrentVotings votings={votings} />
-            <UserInfo />
-            <FetchAccounts />
-            <GoBackButton />
-        </>
-    )
+        <h2>Все предложения на голосовании</h2>
+        <AllCurrentVotings votings={votings} />
+        <UserInfo />
+        <FetchAccounts />
+        <GoBackButton />
+      </>
+    );
 }

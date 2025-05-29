@@ -236,14 +236,19 @@ input {
 .routeLink {
   padding: 10px;
   border-radius: 8px;
-  color: rgb(0, 0, 0);
-  background-color: #e6e6e6;
+  color: white;
+  background-color: #6c757d;
   margin-inline: 10px;
   transition: ease all 200ms;
 }
 
 .routeLink:hover {
-  background-color: #d3d3d3;
+  background-color: #5c636a;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
 }
 
 .creator {
