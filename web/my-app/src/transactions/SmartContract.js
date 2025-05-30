@@ -87,6 +87,12 @@ export default class SmartContract {
         return result
     }
 
+    async supportVote(id, voter, amount) {
+        await this.contract.methods
+            .supportVote(id, voter, amount)
+            .send({ from: this.selectedAccount })
+    }
+
     async createPropose(currentPropose, description, quorumType, memberOrStartup, amountOrParameter) {
         // Здесь тип кворума weighted, потому что голосование токенами
         if (currentPropose == 0 || currentPropose == 1) {

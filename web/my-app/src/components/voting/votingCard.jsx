@@ -2,16 +2,16 @@ import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { useData } from '../../data/DataProvider'
 import { Button } from 'react-bootstrap'
 
-export default function VotingCard({ voting, showAll }) {
+export default function VotingCard({ voting }) {
   const [name, setName] = useState()
-  const [seconds, setSeconds] = useState("")
+  const [seconds, setSeconds] = useState("Загрузка...")
   const [minutes, setMinutes] = useState("")
   const [votingInfo, setVotingInfo] = useState()
-  const { smartContract } = useData()
+  const { smartContract, user } = useData()
 
   async function getUser() {
-    const user = await smartContract.getUserObject(voting.initiator)
-    setName(user.name)
+    const creator = await smartContract.getUserObject(voting.initiator)
+    setName(creator.name)
   }
 
   const votingStatus = [
@@ -24,11 +24,10 @@ export default function VotingCard({ voting, showAll }) {
 
   const getVotings = async () => {
     const votingInfo = await smartContract.getVotes(voting.id)
-    console.log(votingInfo)
     setVotingInfo(votingInfo)
   }
 
-  async function test() {
+  async function executeProposal() {
     await smartContract.executeProposal(voting.id, voting.initiator)
   }
 
@@ -47,9 +46,6 @@ export default function VotingCard({ voting, showAll }) {
         clearInterval(interval)
         setMinutes(0)
         setSeconds(0)
-        // if (!showAll) {
-        //   setVotingInfo((prev) => prev.status = 1)
-        // }
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -65,9 +61,8 @@ export default function VotingCard({ voting, showAll }) {
     alert("Адрес пользователя скопирован")
   }
 
-  if (votingInfo?.status == 3) return (
+  if (votingInfo?.status == 3 || votingInfo?.status == 1) return (
     <div className='ProposalCard'>
-      <Button variant="secondary" onClick={test}>Инициализировать</Button>
       <h3>Описание: {votingInfo?.description}</h3>
       <p>
         ID голосования: {voting?.id.toString().slice(0, 8)}
@@ -79,15 +74,16 @@ export default function VotingCard({ voting, showAll }) {
       <p>Выполнено: {voting?.executed ? "Да" : "Нет"}</p>
       <p>Голоса за: {votingInfo?.votesFor}</p>
       <p>Голоса против: {votingInfo?.votesAgainst}</p>
-      <p>Статус голосования: {votingStatus[voting?.votingStatus]}</p>
+      <p>Статус голосования: {votingStatus[votingInfo?.status]}</p>
 
       <div>
         <h3 style={{ marginTop: "15px" }}>Обратный таймер</h3>
-        {(seconds == 0 && minutes == 0) ? (
-          <p>Время завершилось!</p>
-        ) : (
-          <p>{`${minutes ? minutes + ":" : ""}${seconds < 10 ? '0' : ''}${seconds}`}</p>
-        )}
+        <p className='votingTimer'>{(seconds == 0 && minutes == 0) ? "Время завершилось!" : `${minutes ? minutes + ":" : ""}${seconds < 10 ? '0' : ''}${seconds}`}</p>
+        {
+          (seconds == 0 && minutes == 0 && (user.name == name)) && (
+            <Button style={{ display: "flex" }} variant="secondary" onClick={executeProposal}>Инициализировать</Button>
+          )
+        }
       </div>
     </div >
   )

@@ -33,7 +33,7 @@ export default function AcceptedProposals() {
       {
         votings == []
           ? <h3> Нету голосований</h3>
-          : <AllCurrentVotings votings={votings} showAll={true} />
+          : <AllCurrentVotings votings={votings} />
       }
       <FetchAccounts />
       <GoBackButton />

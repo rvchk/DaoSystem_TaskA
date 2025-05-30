@@ -12,7 +12,7 @@ export default function ProposalCard({ proposal }) {
   }
 
   const getUserName = async () => {
-    const user = await smartContract.getUserObject(proposal.creator)
+    const user = await smartContract.getUserObject(proposal.proposer)
     setName(user.name)
   }
 
