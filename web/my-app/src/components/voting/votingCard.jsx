@@ -31,6 +31,11 @@ export default function VotingCard({ voting }) {
     await smartContract.executeProposal(voting.id, voting.initiator)
   }
 
+  const cancelVoting = async () => {
+    await smartContract.cancelVoting(voting.id)
+    alert("Голосование закрыто")
+  }
+
   useEffect(() => {
     if (smartContract) {
       getUser()
@@ -61,15 +66,20 @@ export default function VotingCard({ voting }) {
     alert("Адрес пользователя скопирован")
   }
 
-  if (votingInfo?.status == 3 || votingInfo?.status == 1) return (
+  if (votingInfo?.status != 1 && votingInfo?.status != 4) return (
     <div className='ProposalCard'>
+      {
+        (user.name == name && minutes != 0 && seconds != 0) && (
+          <button className='deleteIcon' onClick={cancelVoting}>
+            <img src="/delete-icon.png" alt="#" />
+          </button>
+        )
+      }
       <h3>Описание: {votingInfo?.description}</h3>
       <p>
-        ID голосования: {voting?.id.toString().slice(0, 8)}
-        ...
+        ID голосования: {voting?.id.toString().slice(0, 8)}...
         <a onClick={copyProposeId} className='copyButton'>Копировать</a>
       </p>
-
       Создатель: <button className='copyButton' onClick={copyUserAddress}>{name}</button>
       <p>Выполнено: {voting?.executed ? "Да" : "Нет"}</p>
       <p>Голоса за: {votingInfo?.votesFor}</p>

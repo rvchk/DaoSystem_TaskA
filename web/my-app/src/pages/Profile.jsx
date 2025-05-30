@@ -3,17 +3,20 @@ import { useData } from "../data/DataProvider"
 import FetchAccounts from "../components/shared/FetchAccounts"
 import { GoBackButton } from "../components/shared/goBackButton"
 import Button from 'react-bootstrap/Button';
-import { Container, Form, Image, Stack } from "react-bootstrap";
+import { Container, Form, Image, InputGroup, Stack } from "react-bootstrap";
 
 export default function Profile() {
   const wrapAmountRef = useRef()
   const { smartContract, selectedAccount, user } = useData()
   const [selectedValue, setSelectedValue] = useState()
+  const [exchange, setExchange] = useState(0)
+  const [currentAmount, setCurrentAmount] = useState(0)
   const [profi, setProfi] = useState()
 
   useEffect(() => {
     if (smartContract) {
       getBalances()
+      getExchange()
     }
   }, [smartContract])
 
@@ -22,19 +25,24 @@ export default function Profile() {
     setProfi(profiBalance)
   }
 
+  async function getExchange() {
+    const result = await smartContract.getWrapExchange()
+    setExchange(result)
+    console.log(result)
+  }
+
   const buyWrap = async () => {
-    const amount = wrapAmountRef.current.value
-    if (!amount) {
+    if (!currentAmount) {
       alert("Введите значение!")
       return
     }
-    
+
     if (selectedValue == "eth") {
-      await smartContract.buyWrapTokensByEth(amount)
+      await smartContract.buyWrapTokensByEth(currentAmount)
       location.reload()
     }
     else {
-      await smartContract.buyWrapTokensByProfi(amount)
+      await smartContract.buyWrapTokensByProfi(currentAmount)
       location.reload()
     }
   }
@@ -52,11 +60,20 @@ export default function Profile() {
       </Stack>
       <h2>Купить врап токены</h2>
       <Stack direction="horizontal" gap={3}>
-        <Form.Select aria-label="Default select example" onChange={(e) => setSelectedValue(e.target.value)}>
+        <Form.Select style={{ width: "150px" }} onChange={(e) => setSelectedValue(e.target.value)}>
           <option value="profi">За PROFI</option>
           <option value="eth">За ETH</option>
         </Form.Select>
-        <Form.Control className="me-auto" placeholder="Сколько врап?" ref={wrapAmountRef} />
+        <InputGroup>
+          <InputGroup.Text>{exchange}</InputGroup.Text>
+          <Form.Control
+            placeholder="Сколько врап?"
+            onChange={e => setCurrentAmount(e.target.value)}
+            value={currentAmount}
+            ref={wrapAmountRef}
+          />
+          <InputGroup.Text>{currentAmount * Number(exchange)}</InputGroup.Text>
+        </InputGroup>
         <Button variant="secondary" onClick={buyWrap}>Купить</Button>
       </Stack>
       <FetchAccounts />

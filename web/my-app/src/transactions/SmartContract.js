@@ -135,6 +135,21 @@ export default class SmartContract {
             .send({ from: this.selectedAccount })
     }
 
+    async getWrapExchange() {
+        const result = await this.contract.methods
+            .RtkExchangeRate()
+            .call()
+        return result
+    }
+
+    async cancelVoting(id) {
+        try {
+            await this.contract.methods.cancelVoting(id).send({ from: this.selectedAccount });
+        } catch (error) {
+            console.error("Ошибка:", error.reason || error.message);
+        }
+    }
+
     async castVote(proposalId, support, tokenAmount) {
         await this.contract.methods
             .castVote(proposalId, support, tokenAmount)

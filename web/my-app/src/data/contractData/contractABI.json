@@ -714,6 +714,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "RtkExchangeRate",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "WrapTokenPrice",
 		"outputs": [
 			{
@@ -2053,11 +2066,6 @@
 			{
 				"internalType": "uint256",
 				"name": "votesAgainst",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "totalVotes",
 				"type": "uint256"
 			}
 		],
