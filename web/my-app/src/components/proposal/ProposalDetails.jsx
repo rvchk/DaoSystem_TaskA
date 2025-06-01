@@ -1,24 +1,25 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useData } from "../../data/DataProvider";
 
 export const ProposalDetails = ({ proposal }) => {
-  const [user, setUser] = useState()
-  const { smartContract } = useData()
-  async function getUser() {
-    const user = await smartContract.getUserObject(proposal.targetAddress)
-    setUser(user)
-  }
+  const [user, setUser] = useState();
+  const { smartContract } = useData();
+
+  const getUser = useCallback(async () => {
+    const user = await smartContract.getUserObject(proposal.targetAddress);
+    setUser(user);
+  }, [proposal.targetAddress, smartContract]);
 
   const copyUserAddress = () => {
-    navigator.clipboard.writeText(proposal.targetAddress)
-    alert("Адрес пользователя скопирован")
-  }
+    navigator.clipboard.writeText(proposal.targetAddress);
+    alert("Адрес пользователя скопирован");
+  };
 
   useEffect(() => {
     if (smartContract) {
-      getUser()
+      getUser();
     }
-  }, [smartContract])
+  }, [smartContract, getUser]);
 
   return (
     <div className="proposal-details">
@@ -27,23 +28,32 @@ export const ProposalDetails = ({ proposal }) => {
           <p>Количество инвестиций: {proposal.targetAmount} ETH</p>
           <span>
             Адрес: {proposal.targetAddress.toString().slice(0, 8)}...
-            <a onClick={copyUserAddress} className='copyButton'>Копировать</a>
+            <a onClick={copyUserAddress} className="copyButton">
+              Копировать
+            </a>
           </span>
         </div>
       )}
-      {proposal.proposalType == "2" || proposal.proposalType == "3" && (
-        <>
-          <p>Имя пользователя: <strong>{user?.name}</strong></p>
-          <span>
-            Адрес: {proposal.targetAddress.toString().slice(0, 8)}...
-            <a onClick={copyUserAddress} className='copyButton'>Копировать</a>
-          </span>
-        </>
-      )}
+      {proposal.proposalType == "2" ||
+        (proposal.proposalType == "3" && (
+          <>
+            <p>
+              Имя пользователя: <strong>{user?.name}</strong>
+            </p>
+            <span>
+              Адрес: {proposal.targetAddress.toString().slice(0, 8)}...
+              <a onClick={copyUserAddress} className="copyButton">
+                Копировать
+              </a>
+            </span>
+          </>
+        ))}
       {proposal.proposalType == "4" && (
         <div>
           <p>Адрес токена: {proposal.targetAddress}</p>
-          <p>Новая цена: <strong>{proposal.targetAmount}</strong></p>
+          <p>
+            Новая цена: <strong>{proposal.targetAmount}</strong>
+          </p>
         </div>
       )}
     </div>
