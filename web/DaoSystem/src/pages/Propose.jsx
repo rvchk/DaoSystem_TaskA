@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useData } from "../data/DataProvider";
 import AllUserProposals from "../components/proposal/AllUserProposals";
 import FetchAccounts from "../components/shared/FetchAccounts";
@@ -7,10 +7,15 @@ import StartVotingForm from "../components/proposal/forms/startVotingForm";
 import CreateProposalForm from "../components/proposal/forms/createProposalForm";
 
 function Propose() {
-  const { smartContract, selectedAccount } = useData();
+  const { smartContract, selectedAccount, user } = useData();
   const [userProposals, setUserProposals] = useState("");
 
   useEffect(() => {
+    console.log(user?.status);
+    if (user?.status != "1" && user?.status != undefined) {
+      alert("Вы не участник DAO");
+      window.history.go(-1);
+    }
     if (smartContract) {
       fetchProposalDetails();
     }
@@ -32,6 +37,7 @@ function Propose() {
 
   return (
     <>
+      <h1>Предложения</h1>
       <StartVotingForm />
       <CreateProposalForm />
       {userProposals.length > 0 && (

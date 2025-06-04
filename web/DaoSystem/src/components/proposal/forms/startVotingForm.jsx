@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { useData } from "../../../data/DataProvider";
 
 export default function StartVotingForm() {
@@ -30,10 +30,13 @@ export default function StartVotingForm() {
 
   return (
     <>
-      <h1>Предложения</h1>
       <h2>Вынести на голосование</h2>
-      <input type="text" placeholder="ID предложения" ref={proposeIdRef} />
-      <input type="time" ref={votingTimeRef} />
+      <Form.Control
+        type="text"
+        placeholder="ID предложения"
+        ref={proposeIdRef}
+      />
+      <Form.Control type="time" ref={votingTimeRef} />
       <Button onClick={startVoting} variant="secondary">
         Вынести
       </Button>

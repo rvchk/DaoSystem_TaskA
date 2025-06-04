@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Container, Form, Row } from "react-bootstrap";
 import { useData } from "../../../data/DataProvider";
 
 export default function CreateProposalForm() {
@@ -49,7 +49,11 @@ export default function CreateProposalForm() {
   return (
     <>
       <h2>Создание предложения</h2>
-      <select value={currentPropose} onChange={handleChangeProposeCreation}>
+      <Form.Select
+        className="w-75 mx-auto"
+        value={currentPropose}
+        onChange={handleChangeProposeCreation}
+      >
         <option value="default" disabled>
           Выбрать тип предложения
         </option>
@@ -58,28 +62,28 @@ export default function CreateProposalForm() {
         <option value="2">Добавить пользователя</option>
         <option value="3">Исключить пользователя</option>
         <option value="4">Изменить токен wrap</option>
-      </select>
-
-      <input
-        type="text"
-        placeholder="Описание предложения"
-        ref={descriptionRef}
-      />
-      <input type="test" placeholder="Нужный адрес" ref={addressRef} />
+      </Form.Select>
+      <Form.Control type="text" placeholder="Описание" ref={descriptionRef} />
+      <Form.Control type="text" placeholder="Нужный адрес" ref={addressRef} />
       {currentPropose != 2 && currentPropose != 3 && (
-        <input type="number" placeholder="Нужное количество" ref={amountRef} />
+        <Form.Control
+          type="number"
+          placeholder="Нужное количество"
+          ref={amountRef}
+        />
       )}
       {currentPropose != 0 && currentPropose != 1 && (
-        <div style={{ marginBottom: "15px" }}>
-          <span>Тип кворума: </span>
-          <select
+        <Row className="mb-3 justify-content-center">
+          <Form.Label>Тип кворума:</Form.Label>
+          <Form.Select
+            className="w-75  mx-auto"
             value={quorumType}
             onChange={(e) => setQuorumType(e.target.value)}
           >
             <option value="0">50% + 1</option>
             <option value="1">2/3</option>
-          </select>
-        </div>
+          </Form.Select>
+        </Row>
       )}
       <Button variant="secondary" onClick={createPropose}>
         Создать

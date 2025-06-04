@@ -31,15 +31,6 @@ export default function Profile() {
   }
 
   const buyWrap = async () => {
-    if (!currentAmount) {
-      alert("Введите значение!");
-      return;
-    }
-    if (currentAmount <= 0) {
-      alert("Введите положительное значение");
-      return;
-    }
-
     if (selectedValue == "eth") {
       await smartContract.buyWrapTokensByEth(currentAmount);
       location.reload();
@@ -77,6 +68,7 @@ export default function Profile() {
             value={currentAmount}
             ref={wrapAmountRef}
             type="number"
+            required
           />
           <InputGroup.Text>1/{exchange}</InputGroup.Text>
         </InputGroup>

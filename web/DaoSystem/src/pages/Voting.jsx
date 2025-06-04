@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useData } from "../data/DataProvider";
 import { UserInfo } from "../components/shared/userInfo";
 import AllCurrentVotings from "../components/voting/allCurrentVotings";
@@ -7,7 +7,6 @@ import { GoBackButton } from "../components/shared/goBackButton";
 import VotingForm from "../components/voting/forms/votingForm";
 
 export default function Voting() {
-  
   const [votings, setVotings] = useState();
   const { smartContract } = useData();
 
