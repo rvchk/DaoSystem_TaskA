@@ -1,5 +1,5 @@
 cd web/my-app
-start cmd /k "npm run dev"
+start cmd /k "npm install && npm run dev"
 start http://localhost:5173
 
 cd ../../myGeth
