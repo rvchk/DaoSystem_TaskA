@@ -25,13 +25,9 @@ function Propose() {
     let currentProposals = [];
     const pastProposals = await smartContract.getUserPastProposals();
     for (let i = 0; i < pastProposals.length; i++) {
-      currentProposals.push(
-        await smartContract.getProposalInfo(pastProposals[i].returnValues.id),
-      );
+      currentProposals.push(await smartContract.getProposalInfo(pastProposals[i].returnValues.id));
     }
-    const filteredProposals = currentProposals.filter(
-      (proposal) => proposal.id != 0,
-    );
+    const filteredProposals = currentProposals.filter((proposal) => proposal.id != 0);
     setUserProposals(filteredProposals);
   }
 

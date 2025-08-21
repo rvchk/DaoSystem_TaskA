@@ -14,13 +14,7 @@ export default function VotingCard({ voting }) {
     setName(creator.name);
   }
 
-  const votingStatus = [
-    "Ожидает начала",
-    "Не принято",
-    "Принято",
-    "Активно",
-    "Удалено",
-  ];
+  const votingStatus = ["Ожидает начала", "Не принято", "Принято", "Активно", "Удалено"];
 
   const getVotings = async () => {
     const votingInfo = await smartContract.getVotes(voting.id);
@@ -97,11 +91,7 @@ export default function VotingCard({ voting }) {
               : `${minutes ? minutes + ":" : ""}${seconds < 10 ? "0" : ""}${seconds}`}
           </p>
           {seconds == 0 && minutes == 0 && user.name == name && (
-            <Button
-              style={{ display: "flex" }}
-              variant="secondary"
-              onClick={executeProposal}
-            >
+            <Button style={{ display: "flex" }} variant="secondary" onClick={executeProposal}>
               Инициализировать
             </Button>
           )}

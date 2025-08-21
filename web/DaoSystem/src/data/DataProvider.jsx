@@ -1,10 +1,10 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 import contractABI from "./contractData/contractABI.json";
 import { byteCode } from "./contractData/byteCode";
 import SmartContract from "../transactions/SmartContract";
 import Web3 from "web3";
 
-const DataContext = createContext();
+export const DataContext = createContext();
 
 export function DataProvider({ children }) {
   const [factory, setFactory] = useState();
@@ -28,7 +28,7 @@ export function DataProvider({ children }) {
     const options = {
       from: ownerAddress,
       gas: "9986871",
-      gasPrice: gasPrice.toString(),
+      gasPrice: gasPrice.toString()
     };
     const deployedContract = await deployedTransaction.send(options);
     localStorage.setItem("contractId", deployedContract.options.address);
@@ -37,10 +37,7 @@ export function DataProvider({ children }) {
 
   function handleContract() {
     const web3 = new Web3(window.ethereum);
-    const contract = new web3.eth.Contract(
-      contractABI,
-      localStorage.getItem("contractId"),
-    );
+    const contract = new web3.eth.Contract(contractABI, localStorage.getItem("contractId"));
     setFactory(contract);
   }
 
@@ -63,12 +60,10 @@ export function DataProvider({ children }) {
         smartContract,
         selectedAccount,
         factory,
-        user,
+        user
       }}
     >
       {children}
     </DataContext.Provider>
   );
 }
-
-export const useData = () => useContext(DataContext);

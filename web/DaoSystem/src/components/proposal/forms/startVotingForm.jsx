@@ -31,11 +31,7 @@ export default function StartVotingForm() {
   return (
     <>
       <h2>Вынести на голосование</h2>
-      <Form.Control
-        type="text"
-        placeholder="ID предложения"
-        ref={proposeIdRef}
-      />
+      <Form.Control type="text" placeholder="ID предложения" ref={proposeIdRef} />
       <Form.Control type="time" ref={votingTimeRef} />
       <Button onClick={startVoting} variant="secondary">
         Вынести

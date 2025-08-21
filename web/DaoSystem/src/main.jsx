@@ -1,12 +1,12 @@
-import { createRoot } from "react-dom/client";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
+import AcceptedProposals from "./pages/acceptedProposals.jsx";
 import { DataProvider } from "./data/DataProvider.jsx";
-import "./index.css";
-import App from "./App.jsx";
-import Voting from "./pages/Voting.jsx";
+import { createRoot } from "react-dom/client";
 import Profile from "./pages/Profile.jsx";
 import Propose from "./pages/Propose.jsx";
-import AcceptedProposals from "./pages/acceptedProposals.jsx";
+import Voting from "./pages/Voting.jsx";
+import App from "./App.jsx";
+import "./index.css";
 
 const routes = [
   { path: "/", component: App },
@@ -14,7 +14,7 @@ const routes = [
   { path: "/profile", component: Profile },
   { path: "/propose", component: Propose },
   { path: "/acceptedProposals", component: AcceptedProposals },
-  { path: "*", component: App },
+  { path: "*", component: App }
 ];
 
 createRoot(document.getElementById("root")).render(
@@ -26,5 +26,5 @@ createRoot(document.getElementById("root")).render(
         ))}
       </Routes>
     </BrowserRouter>
-  </DataProvider>,
+  </DataProvider>
 );

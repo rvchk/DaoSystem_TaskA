@@ -30,11 +30,7 @@ export default function AcceptedProposals() {
     <>
       <h1>Все голосования</h1>
       <h2>Все предложения вынесенные на голосование</h2>
-      {votings == [] ? (
-        <h3> Нету голосований</h3>
-      ) : (
-        <AllCurrentVotings votings={votings} />
-      )}
+      {votings == [] ? <h3> Нету голосований</h3> : <AllCurrentVotings votings={votings} />}
       <FetchAccounts />
       <GoBackButton />
     </>

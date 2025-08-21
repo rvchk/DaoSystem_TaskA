@@ -53,10 +53,7 @@ export default function Profile() {
       </Stack>
       <h2>Купить врап токены</h2>
       <Stack direction="horizontal" gap={3}>
-        <Form.Select
-          style={{ width: "150px" }}
-          onChange={(e) => setSelectedValue(e.target.value)}
-        >
+        <Form.Select style={{ width: "150px" }} onChange={(e) => setSelectedValue(e.target.value)}>
           <option value="profi">За PROFI</option>
           <option value="eth">За ETH</option>
         </Form.Select>

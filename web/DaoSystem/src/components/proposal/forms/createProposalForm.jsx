@@ -22,11 +22,7 @@ export default function CreateProposalForm() {
       alert("Выберите тип предложения");
       return;
     }
-    if (
-      !descriptionRef.current.value ||
-      !addressRef.current.value ||
-      amount < 0
-    ) {
+    if (!descriptionRef.current.value || !addressRef.current.value || amount < 0) {
       alert("Заполните все поля");
       return;
     }
@@ -39,7 +35,7 @@ export default function CreateProposalForm() {
       descriptionRef.current.value,
       quorumType || 2,
       addressRef.current.value,
-      amount,
+      amount
     );
     descriptionRef.current.value = "";
     addressRef.current.value = "";
@@ -66,11 +62,7 @@ export default function CreateProposalForm() {
       <Form.Control type="text" placeholder="Описание" ref={descriptionRef} />
       <Form.Control type="text" placeholder="Нужный адрес" ref={addressRef} />
       {currentPropose != 2 && currentPropose != 3 && (
-        <Form.Control
-          type="number"
-          placeholder="Нужное количество"
-          ref={amountRef}
-        />
+        <Form.Control type="number" placeholder="Нужное количество" ref={amountRef} />
       )}
       {currentPropose != 0 && currentPropose != 1 && (
         <Row className="mb-3 justify-content-center">

@@ -10,9 +10,7 @@ export default class SmartContract {
   }
   // Метод получения Профи баланса пользователя
   async getBalanceProfi(userAddress) {
-    const result = await this.contract.methods
-      .getBalanceProfi(userAddress)
-      .call();
+    const result = await this.contract.methods.getBalanceProfi(userAddress).call();
     return result;
   }
 
@@ -23,7 +21,7 @@ export default class SmartContract {
 
   async buyWrapTokensByProfi(amount) {
     const result = await this.contract.methods.buyWrapWithProfi(amount).send({
-      from: this.selectedAccount,
+      from: this.selectedAccount
     });
     return result;
   }
@@ -31,7 +29,7 @@ export default class SmartContract {
   async buyWrapTokensByEth(amount) {
     const result = await this.contract.methods.buyWrapWithEth(amount).send({
       from: this.selectedAccount,
-      value: ethers.parseEther(amount.toString()),
+      value: ethers.parseEther(amount.toString())
     });
     return result;
   }
@@ -40,7 +38,7 @@ export default class SmartContract {
     const result = await this.contract.getPastEvents("ProposalCreated", {
       filter: { creator: this.selectedAccount, executed: "false" },
       fromBlock: 0,
-      toBlock: "latest",
+      toBlock: "latest"
     });
     return result;
   }
@@ -49,7 +47,7 @@ export default class SmartContract {
     const result = await this.contract.getPastEvents("VotingStarted", {
       filter: { votingStatus: "3" },
       fromBlock: 0,
-      toBlock: "latest",
+      toBlock: "latest"
     });
     return result;
   }
@@ -57,7 +55,7 @@ export default class SmartContract {
   async getAllVotings() {
     const result = await this.contract.getPastEvents("VotingStarted", {
       fromBlock: 0,
-      toBlock: "latest",
+      toBlock: "latest"
     });
     console.log(result);
     return result;
@@ -66,7 +64,7 @@ export default class SmartContract {
   async getInvestment() {
     const result = await this.contract.getPastEvents("NewStartupInvestment", {
       fromBlock: 0,
-      toBlock: "latest",
+      toBlock: "latest"
     });
     console.log(result);
     return result;
@@ -75,35 +73,21 @@ export default class SmartContract {
   async getAcceptedProposals() {
     const result = await this.contract.getPastEvents("ProposalExecuted", {
       fromBlock: 0,
-      toBlock: "latest",
+      toBlock: "latest"
     });
     console.log(result);
     return result;
   }
 
   async supportVote(id, voter, amount) {
-    await this.contract.methods
-      .supportVote(id, voter, amount)
-      .send({ from: this.selectedAccount });
+    await this.contract.methods.supportVote(id, voter, amount).send({ from: this.selectedAccount });
   }
 
-  async createPropose(
-    currentPropose,
-    description,
-    quorumType,
-    memberOrStartup,
-    amountOrParameter,
-  ) {
+  async createPropose(currentPropose, description, quorumType, memberOrStartup, amountOrParameter) {
     // Здесь тип кворума weighted, потому что голосование токенами
     if (currentPropose == 0 || currentPropose == 1) {
       const result = await this.contract.methods
-        .propose(
-          currentPropose,
-          description,
-          2,
-          memberOrStartup,
-          amountOrParameter,
-        )
+        .propose(currentPropose, description, 2, memberOrStartup, amountOrParameter)
         .send({ from: this.selectedAccount });
       return result.events.ProposalCreated.returnValues;
     }
@@ -111,13 +95,7 @@ export default class SmartContract {
     // Тут можно выбрать тип достижения кворума
     else {
       const result = await this.contract.methods
-        .propose(
-          currentPropose,
-          description,
-          quorumType,
-          memberOrStartup,
-          amountOrParameter,
-        )
+        .propose(currentPropose, description, quorumType, memberOrStartup, amountOrParameter)
         .send({ from: this.selectedAccount });
       return result.events.ProposalCreated.returnValues;
     }
@@ -125,9 +103,7 @@ export default class SmartContract {
 
   async fetchUserProposals() {
     try {
-      const proposals = await this.contract.methods
-        .getUserProposals(this.selectedAccount)
-        .call();
+      const proposals = await this.contract.methods.getUserProposals(this.selectedAccount).call();
       return proposals;
     } catch (error) {
       console.error("Error fetching user proposals:", error.message);
@@ -152,9 +128,7 @@ export default class SmartContract {
 
   async cancelVoting(id) {
     try {
-      await this.contract.methods
-        .cancelVoting(id)
-        .send({ from: this.selectedAccount });
+      await this.contract.methods.cancelVoting(id).send({ from: this.selectedAccount });
     } catch (error) {
       console.error("Ошибка:", error.reason || error.message);
     }
@@ -177,9 +151,7 @@ export default class SmartContract {
   }
 
   async deleteProposal(id) {
-    await this.contract.methods
-      .deleteProposal(id)
-      .send({ from: this.selectedAccount });
+    await this.contract.methods.deleteProposal(id).send({ from: this.selectedAccount });
     console.log("Предложение удалено");
   }
 

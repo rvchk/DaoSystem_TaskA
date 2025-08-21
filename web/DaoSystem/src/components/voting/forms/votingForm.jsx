@@ -35,17 +35,13 @@ export default function VotingForm() {
       alert("Введите положительное значение!");
       return;
     }
-    await smartContract.supportVote(
-      votingId.current.value,
-      addressRef.current.value,
-      votingAmount,
-    );
+    await smartContract.supportVote(votingId.current.value, addressRef.current.value, votingAmount);
   };
 
   return (
     <>
       <h2>{selectedToken == "profi" ? "Проголосовать" : "Поддержать"}</h2>
-      <Form.Control type="number" placeholder="ID голосования" ref={votingId}/>
+      <Form.Control type="number" placeholder="ID голосования" ref={votingId} />
       {selectedToken == "wrap" && (
         <input type="text" placeholder="Адрес пользователя" ref={addressRef} />
       )}
@@ -80,11 +76,7 @@ export default function VotingForm() {
           </Button>
         </Stack>
       ) : (
-        <Button
-          variant="secondary"
-          onClick={supportVote}
-          style={{ marginTop: "10px" }}
-        >
+        <Button variant="secondary" onClick={supportVote} style={{ marginTop: "10px" }}>
           Поддержать
         </Button>
       )}
