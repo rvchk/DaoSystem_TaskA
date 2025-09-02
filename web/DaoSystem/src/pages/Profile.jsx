@@ -42,8 +42,8 @@ export default function Profile() {
 
   return (
     <>
-      <Stack direction="horizontal" className="userCard">
-        <Image src="/user.png" width={"150px"} />
+      <Stack direction='horizontal' className='userCard'>
+        <Image src='/user.png' width={"150px"} />
         <Container>
           <h1>{user?.name}</h1>
           <h2>{user?.status == 1 ? "Участник DAO" : "Не участник DAO"} </h2>
@@ -52,24 +52,24 @@ export default function Profile() {
         </Container>
       </Stack>
       <h2>Купить врап токены</h2>
-      <Stack direction="horizontal" gap={3}>
+      <Stack direction='horizontal' gap={3}>
         <Form.Select style={{ width: "150px" }} onChange={(e) => setSelectedValue(e.target.value)}>
-          <option value="profi">За PROFI</option>
-          <option value="eth">За ETH</option>
+          <option value='profi'>За PROFI</option>
+          <option value='eth'>За ETH</option>
         </Form.Select>
         <InputGroup>
           <InputGroup.Text>{currentAmount * Number(exchange)}</InputGroup.Text>
           <Form.Control
-            placeholder="Сколько врап?"
+            placeholder='Сколько врап?'
             onChange={(e) => setCurrentAmount(e.target.value)}
             value={currentAmount}
             ref={wrapAmountRef}
-            type="number"
+            type='number'
             required
           />
           <InputGroup.Text>1/{exchange}</InputGroup.Text>
         </InputGroup>
-        <Button variant="secondary" onClick={buyWrap}>
+        <Button variant='secondary' onClick={buyWrap}>
           Купить
         </Button>
       </Stack>

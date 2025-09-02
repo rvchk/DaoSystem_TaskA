@@ -46,38 +46,38 @@ export default function CreateProposalForm() {
     <>
       <h2>Создание предложения</h2>
       <Form.Select
-        className="w-75 mx-auto"
+        className='w-75 mx-auto'
         value={currentPropose}
         onChange={handleChangeProposeCreation}
       >
-        <option value="default" disabled>
+        <option value='default' disabled>
           Выбрать тип предложения
         </option>
-        <option value="0">Новые инвестиции</option>
-        <option value="1">Инвестировать</option>
-        <option value="2">Добавить пользователя</option>
-        <option value="3">Исключить пользователя</option>
-        <option value="4">Изменить токен wrap</option>
+        <option value='0'>Новые инвестиции</option>
+        <option value='1'>Инвестировать</option>
+        <option value='2'>Добавить пользователя</option>
+        <option value='3'>Исключить пользователя</option>
+        <option value='4'>Изменить токен wrap</option>
       </Form.Select>
-      <Form.Control type="text" placeholder="Описание" ref={descriptionRef} />
-      <Form.Control type="text" placeholder="Нужный адрес" ref={addressRef} />
+      <Form.Control type='text' placeholder='Описание' ref={descriptionRef} />
+      <Form.Control type='text' placeholder='Нужный адрес' ref={addressRef} />
       {currentPropose != 2 && currentPropose != 3 && (
-        <Form.Control type="number" placeholder="Нужное количество" ref={amountRef} />
+        <Form.Control type='number' placeholder='Нужное количество' ref={amountRef} />
       )}
       {currentPropose != 0 && currentPropose != 1 && (
-        <Row className="mb-3 justify-content-center">
+        <Row className='mb-3 justify-content-center'>
           <Form.Label>Тип кворума:</Form.Label>
           <Form.Select
-            className="w-75  mx-auto"
+            className='w-75  mx-auto'
             value={quorumType}
             onChange={(e) => setQuorumType(e.target.value)}
           >
-            <option value="0">50% + 1</option>
-            <option value="1">2/3</option>
+            <option value='0'>50% + 1</option>
+            <option value='1'>2/3</option>
           </Form.Select>
         </Row>
       )}
-      <Button variant="secondary" onClick={createPropose}>
+      <Button variant='secondary' onClick={createPropose}>
         Создать
       </Button>
     </>

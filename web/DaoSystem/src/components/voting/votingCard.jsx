@@ -62,21 +62,21 @@ export default function VotingCard({ voting }) {
 
   if (votingInfo?.status != 1 && votingInfo?.status != 4)
     return (
-      <div className="ProposalCard">
+      <div className='ProposalCard'>
         {user.name == name && minutes != 0 && seconds != 0 && (
-          <button className="deleteIcon" onClick={cancelVoting}>
-            <img src="/delete-icon.png" alt="#" />
+          <button className='deleteIcon' onClick={cancelVoting}>
+            <img src='/delete-icon.png' alt='#' />
           </button>
         )}
         <h3>Описание: {votingInfo?.description}</h3>
         <p>
           ID голосования: {voting?.id.toString().slice(0, 8)}...
-          <a onClick={copyProposeId} className="copyButton">
+          <a onClick={copyProposeId} className='copyButton'>
             Копировать
           </a>
         </p>
         Создатель:{" "}
-        <button className="copyButton" onClick={copyUserAddress}>
+        <button className='copyButton' onClick={copyUserAddress}>
           {name}
         </button>
         <p>Выполнено: {voting?.executed ? "Да" : "Нет"}</p>
@@ -85,13 +85,13 @@ export default function VotingCard({ voting }) {
         <p>Статус голосования: {votingStatus[votingInfo?.status]}</p>
         <div>
           <h3 style={{ marginTop: "15px" }}>Обратный таймер</h3>
-          <p className="votingTimer">
+          <p className='votingTimer'>
             {seconds == 0 && minutes == 0
               ? "Время завершилось!"
               : `${minutes ? minutes + ":" : ""}${seconds < 10 ? "0" : ""}${seconds}`}
           </p>
           {seconds == 0 && minutes == 0 && user.name == name && (
-            <Button style={{ display: "flex" }} variant="secondary" onClick={executeProposal}>
+            <Button style={{ display: "flex" }} variant='secondary' onClick={executeProposal}>
               Инициализировать
             </Button>
           )}

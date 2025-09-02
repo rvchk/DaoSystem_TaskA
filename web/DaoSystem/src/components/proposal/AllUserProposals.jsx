@@ -3,7 +3,7 @@ import ProposalCard from "./ProposalCard";
 
 export default function AllUserProposals({ userProposals }) {
   return (
-    <div className="AllProposals">
+    <div className='AllProposals'>
       {userProposals.map((proposal) => (
         <ProposalCard proposal={proposal} key={proposal.id} />
       ))}

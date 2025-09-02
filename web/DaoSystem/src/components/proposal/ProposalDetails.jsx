@@ -22,13 +22,13 @@ export const ProposalDetails = ({ proposal }) => {
   }, [smartContract, getUser]);
 
   return (
-    <div className="proposal-details">
+    <div className='proposal-details'>
       {(proposal.proposalType == "0" || proposal.proposalType == "1") && (
         <div>
           <p>Количество инвестиций: {proposal.targetAmount} ETH</p>
           <span>
             Адрес: {proposal.targetAddress.toString().slice(0, 8)}...
-            <a onClick={copyUserAddress} className="copyButton">
+            <a onClick={copyUserAddress} className='copyButton'>
               Копировать
             </a>
           </span>
@@ -42,7 +42,7 @@ export const ProposalDetails = ({ proposal }) => {
             </p>
             <span>
               Адрес: {proposal.targetAddress.toString().slice(0, 8)}...
-              <a onClick={copyUserAddress} className="copyButton">
+              <a onClick={copyUserAddress} className='copyButton'>
                 Копировать
               </a>
             </span>

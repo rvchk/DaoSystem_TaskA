@@ -44,9 +44,9 @@ export default function ProposalCard({ proposal }) {
   return (
     <>
       {proposalInfo?.votingId != 0 && (
-        <div className="ProposalCard">
-          <button className="deleteIcon" onClick={deleteProposal}>
-            <img src="/delete-icon.png" alt="#" />
+        <div className='ProposalCard'>
+          <button className='deleteIcon' onClick={deleteProposal}>
+            <img src='/delete-icon.png' alt='#' />
           </button>
           <h3>{proposalTypes[proposal.proposalType]}</h3>
           <p>Описание: {proposal.description}</p>
@@ -54,7 +54,7 @@ export default function ProposalCard({ proposal }) {
           {proposal.executed && <p>Выполнено</p>}
           <span>
             ID: {proposal.id.toString().slice(0, 8)}...
-            <a onClick={copyProposeId} className="copyButton">
+            <a onClick={copyProposeId} className='copyButton'>
               Копировать
             </a>
           </span>

@@ -18,11 +18,11 @@ export const UserInfo = () => {
   }, [smartContract, selectedAccount]);
 
   return (
-    <div className="userInfoBlock">
-      <Link to={"/profile"} className="userInfoName">
+    <div className='userInfoBlock'>
+      <Link to={"/profile"} className='userInfoName'>
         {user?.name}
       </Link>
-      <div className="userInfoBalances">
+      <div className='userInfoBalances'>
         <p>Profi: {profi?.toString().slice(0, -12)}</p>
         <p>Wrap: {user?.wrapTokenBalance}</p>
       </div>

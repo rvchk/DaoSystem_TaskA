@@ -26,7 +26,7 @@ export default function FetchAccounts() {
   };
 
   return (
-    <Button variant="outline-secondary" onClick={navigateToMain} className="fetchAccountsBar">
+    <Button variant='outline-secondary' onClick={navigateToMain} className='fetchAccountsBar'>
       Профессионалы 2025 | Ровчак Матвей Сергеевич
     </Button>
   );

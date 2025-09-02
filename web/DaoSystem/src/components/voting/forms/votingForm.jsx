@@ -41,22 +41,22 @@ export default function VotingForm() {
   return (
     <>
       <h2>{selectedToken == "profi" ? "Проголосовать" : "Поддержать"}</h2>
-      <Form.Control type="number" placeholder="ID голосования" ref={votingId} />
+      <Form.Control type='number' placeholder='ID голосования' ref={votingId} />
       {selectedToken == "wrap" && (
-        <input type="text" placeholder="Адрес пользователя" ref={addressRef} />
+        <input type='text' placeholder='Адрес пользователя' ref={addressRef} />
       )}
-      <Stack direction="horizontal" style={{ justifyContent: "center" }}>
+      <Stack direction='horizontal' style={{ justifyContent: "center" }}>
         <Form.Select
           style={{ width: "100px" }}
-          className="flex-shrink-0"
+          className='flex-shrink-0'
           onChange={(e) => setSelectedToken(e.target.value)}
         >
-          <option value="profi">PROFI</option>
-          <option value="wrap">WRAP</option>
+          <option value='profi'>PROFI</option>
+          <option value='wrap'>WRAP</option>
         </Form.Select>
         <Form.Control
-          type="number"
-          placeholder="Сколько токенов..."
+          type='number'
+          placeholder='Сколько токенов...'
           value={votingAmount}
           onChange={(e) => setVotingAmount(e.target.value)}
           style={{ margin: "0" }}
@@ -64,19 +64,19 @@ export default function VotingForm() {
       </Stack>
       {selectedToken == "profi" ? (
         <Stack
-          direction="horizontal"
+          direction='horizontal'
           gap={3}
           style={{ justifyContent: "center", marginTop: "20px" }}
         >
-          <Button variant="success" onClick={sendVoteFor}>
+          <Button variant='success' onClick={sendVoteFor}>
             За
           </Button>
-          <Button variant="danger" onClick={sendVoteAgainst}>
+          <Button variant='danger' onClick={sendVoteAgainst}>
             Против
           </Button>
         </Stack>
       ) : (
-        <Button variant="secondary" onClick={supportVote} style={{ marginTop: "10px" }}>
+        <Button variant='secondary' onClick={supportVote} style={{ marginTop: "10px" }}>
           Поддержать
         </Button>
       )}

@@ -8,17 +8,17 @@ function App() {
   return (
     <div>
       <h1>Интерфейс приложения</h1>
-      <div className="links">
-        <Link className="routeLink" to="/profile">
+      <div className='links'>
+        <Link className='routeLink' to='/profile'>
           Профиль {user?.name}
         </Link>
-        <Link className="routeLink" to="/propose">
+        <Link className='routeLink' to='/propose'>
           Предложения
         </Link>
-        <Link className="routeLink" to="/voting">
+        <Link className='routeLink' to='/voting'>
           Голосования
         </Link>
-        <Link className="routeLink" to="/acceptedProposals">
+        <Link className='routeLink' to='/acceptedProposals'>
           Журнал принятых решений
         </Link>
       </div>

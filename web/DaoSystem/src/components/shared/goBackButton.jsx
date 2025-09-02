@@ -6,8 +6,8 @@ export const GoBackButton = () => {
   };
 
   return (
-    <button className="backButton" onClick={returnToPrev}>
-      <img src={backArrow} alt="backArrow" />
+    <button className='backButton' onClick={returnToPrev}>
+      <img src={backArrow} alt='backArrow' />
     </button>
   );
 };

@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import contractABI from "./contractData/contractABI.json";
 import { byteCode } from "./contractData/byteCode";
 import SmartContract from "../transactions/SmartContract";
@@ -67,3 +67,5 @@ export function DataProvider({ children }) {
     </DataContext.Provider>
   );
 }
+
+export const useData = () => useContext(DataContext);
