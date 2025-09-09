@@ -19,14 +19,14 @@ contract Token is ERC20, ERC20Permit, ERC20Votes {
         allTokenSupply = initialSupply;
     }
 
-    function giveStartTokens() public {
+    function giveStartTokens() external  {
         mint(Tom, allTokenSupply / 4);
         mint(Ben, allTokenSupply / 4);
         mint(Rick, allTokenSupply / 4);
         mint(Jack, allTokenSupply / 4);
     }
 
-    function mint(address account, uint256 amount) public {
+    function mint(address account, uint256 amount) public   {
         _mint(account, amount * (10 ** decimals()));
     }
 
@@ -38,13 +38,13 @@ contract Token is ERC20, ERC20Permit, ERC20Votes {
         uint256 amount
     ) public returns (bool) {
         _transfer(from, to, amount);
-
         return true;
     }
 
     function decimals() public pure override returns(uint8) {
         return 12;
     }
+
     function _update(address from, address to, uint256 amount) internal override(ERC20, ERC20Votes) {
         super._update(from, to, amount);
     }

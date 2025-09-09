@@ -4,5 +4,5 @@ start cmd /k "npm run dev"
 start http://localhost:5173
 
 cd ../../myGeth
-geth --datadir data --dev --http --http.api "eth,net,web3" --http.port 8545 --http.corsdomain "*" --networkid 1337
+geth --datadir data --dev --http --http.api "eth,net,web3,personal" --http.port 8545 --http.corsdomain "*" --networkid 1337 --allow-insecure-unlock --dev.period 0
 pause

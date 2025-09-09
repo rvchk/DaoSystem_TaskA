@@ -32,6 +32,7 @@ export function DataProvider({ children }) {
     };
     const deployedContract = await deployedTransaction.send(options);
     localStorage.setItem("contractId", deployedContract.options.address);
+
     location.reload();
   }
 

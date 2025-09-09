@@ -15,7 +15,7 @@ contract DaoSystem is Governor {
     Token internal RTKCoin;
 
     // Отношение к Profi для обмена
-    uint256 internal RtkExchangeRate = 2;
+    uint256 public RtkExchangeRate = 2;
     uint256 internal VoteTokenRate = 3; // 1 голос = 3 системных токена
     uint256 public WrapTokenPrice = 1; // Цена wrap token = 1 ETH
     
@@ -151,7 +151,7 @@ contract DaoSystem is Governor {
     }
 
     // Фукнция для новых вложений в стартап
-    function newStartupInvestment(address startupAddress, uint256 amount) external {
+    function newStartupInvestment(address startupAddress, uint256 amount) internal {
         emit NewStartupInvestment(startupAddress, amount);
     }
 
@@ -342,8 +342,8 @@ contract DaoSystem is Governor {
     // Функция для отмены голосования
     function cancelVoting(uint256 proposalId) public onlyMember {
         Voting storage voting = votings[proposalId];
-        require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
-        require(msg.sender == voting.initiator, "Only initiator can cancel");
+        // require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
+        // require(msg.sender == voting.initiator, "Only initiator can cancel");
 
         // Возвращаем токены всем проголосовавшим участникам
         for (uint i = 0; i < voting.voters.length; i++) {
@@ -352,13 +352,8 @@ contract DaoSystem is Governor {
             
             if (voteAmount > 0) {
                 // Обнуляем запись о голосе
-                delete votes[proposalId][voter];
-                
-                // Возвращаем токены участнику из счета инициатора
-                require(
-                    Professional.transferFrom(voting.initiator, voter, voteAmount),
-                    "Token transfer failed"
-                );
+                // delete votes[proposalId][voter];
+                Professional.transferFrom(voting.initiator, voter, voteAmount);
             }
         }
     
@@ -371,9 +366,6 @@ contract DaoSystem is Governor {
     function executeProposal(uint256 proposalId) public {
         Proposal storage proposal = proposals[proposalId];
         Voting storage voting = votings[proposalId];
-        
-        require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
-        require(!proposal.executed, "Proposal already executed");
         
         if (quorumReached(proposalId) && _voteSucceeded(proposalId)) {
             voting.status = VotingStatus.APPROVED;
@@ -390,10 +382,10 @@ contract DaoSystem is Governor {
         Proposal storage proposal = proposals[proposalId];
         
         if (proposal.proposalType == ProposalType.INVEST_NEW_STARTUP) {
-            emit NewStartupInvestment(proposal.targetAddress, proposal.targetAmount);
+            newStartupInvestment(proposal.targetAddress, proposal.targetAmount);
         }
         else if (proposal.proposalType == ProposalType.ADD_INVESTMENT) {
-            emit StartupInvestment(proposal.targetAddress, proposal.targetAmount);
+            startupInvestment(proposal.targetAddress, proposal.targetAmount);
         }
         else if (proposal.proposalType == ProposalType.ADD_MEMBER) {
             users[proposal.targetAddress].status = UserStatus.MEMBER;
@@ -413,9 +405,7 @@ contract DaoSystem is Governor {
 
         if (proposal.proposalType == ProposalType.INVEST_NEW_STARTUP || 
             proposal.proposalType == ProposalType.ADD_INVESTMENT) {
-                // Минимальный порог - эквивалент 30% от общего предложенного количества
-                uint256 minQuorum = (Professional.totalSupply() / VoteTokenRate) * 30 / 100;
-                return voting.votesFor >= minQuorum;
+                return voting.votesFor > voting.votesAgainst;
         }
         else {
             if (voting.quorumType == QuorumType.SIMPLE_MAJORITY) {
