@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "./ERC20Bundle.sol";
 
-contract Token is ERC20, ERC20Permit, ERC20Votes {
+contract Token is ERC20 {
     address public Tom = 0xda82d8e188e355c380d77616B2b63b0267aA68eD;
     address public Ben = 0xa0Fddc85DA6Fbe53D2e7d55cbDa9a22c3620816C;
     address public Rick = 0x58E4a1126170CfA7CCF016a9362AE1a9f1c70914;
@@ -15,7 +15,7 @@ contract Token is ERC20, ERC20Permit, ERC20Votes {
         string memory name,
         string memory symbol,
         uint256 initialSupply
-    ) ERC20(name, symbol) ERC20Permit(name) {
+    ) ERC20(name, symbol) {
         allTokenSupply = initialSupply;
     }
 
@@ -43,13 +43,5 @@ contract Token is ERC20, ERC20Permit, ERC20Votes {
 
     function decimals() public pure override returns(uint8) {
         return 12;
-    }
-
-    function _update(address from, address to, uint256 amount) internal override(ERC20, ERC20Votes) {
-        super._update(from, to, amount);
-    }
-
-    function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
-        return super.nonces(owner);
     }
 }

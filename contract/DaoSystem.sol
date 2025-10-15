@@ -1,10 +1,10 @@
-    // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./GovernanceBundle.sol";
+import "./DaoTypes.sol";
 import { Token } from "./Token.sol";
 
-contract DaoSystem is Governor {
+contract DaoSystem {
     address internal Tom = 0xda82d8e188e355c380d77616B2b63b0267aA68eD;
     address internal Ben = 0xa0Fddc85DA6Fbe53D2e7d55cbDa9a22c3620816C;
     address internal Rick = 0x58E4a1126170CfA7CCF016a9362AE1a9f1c70914;
@@ -18,80 +18,7 @@ contract DaoSystem is Governor {
     uint256 public RtkExchangeRate = 2;
     uint256 internal VoteTokenRate = 3; // 1 голос = 3 системных токена
     uint256 public WrapTokenPrice = 1; // Цена wrap token = 1 ETH
-    
-    // Статусы пользователей
-    enum UserStatus {
-        NOT_MEMBER, // Не является участником DAO
-        MEMBER, // Участник DAO
-        BANNED // Заблокированный пользователь, НЕ УВЕРЕН ЧТО ПОНАДОБИТСЯ
-    }
-
-    // Типы предложений
-    enum ProposalType {
-        INVEST_NEW_STARTUP, // Инвестировать в новый стартап
-        ADD_INVESTMENT, // Добавить инвестиций в стартап
-        ADD_MEMBER, // Добавить участника в DAO
-        REMOVE_MEMBER, // Убрать участника из DAO
-        MANAGE_WRAP_TOKEN // Изменить wrap токен
-    }
-
-    // Статусы голосования
-    enum VotingStatus {
-        PENDING,  // Ожидает начала голосования
-        REJECTED, // Не принято
-        APPROVED, // Принято
-        ACTIVE,   // Активно
-        DELETED   // Удалено
-    }
-
-    // Способы достижения кворума
-    enum QuorumType { 
-        SIMPLE_MAJORITY, // 50% +1 голос (Типы propose: C, D, E, F)
-        SUPER_MAJORITY, // 2/3 (Типы propose: C, D, E, F)
-        WEIGHTED // Зависит от количества токенов (Типы propose: A, B)
-    }
-
-    // Структура пользователя
-    struct User {
-        string name;
-        address userAddress;
-        UserStatus status;
-        uint256 wrapTokenBalance;
-    }
-
-    // Структура голосования
-    struct Voting {
-        address initiator;
-        string description;
-        uint256 startTime;
-        uint256 endTime;
-        VotingStatus status;
-        QuorumType quorumType;
-        uint256 votesFor;
-        uint256 votesAgainst;
-        address[] voters;
-    }
-
-    // Структура голоса поддержки
-    struct VoteSupport {
-        uint256 proposalId;
-        address voter; // Адрес пользователя, чей голос поддерживается
-        uint256 wrapTokens; // Количество wrap токенов, использованных для поддержки
-        bool support; // Голос за или против
-    }
-
-    // Структура предложения
-    struct Proposal {
-        uint256 id;
-        address proposer;
-        string description;
-        uint256 votingId;
-        bool executed;
-        bool onVoting;
-        ProposalType proposalType;
-        address targetAddress;
-        uint256 targetAmount;
-    }
+    uint256 public proposalCount = 0; // Счетчик предложений, вместо рандомного числа через super.propose
 
     event VoteSupported(address indexed supporter, address indexed voter, uint256 indexed proposalId, uint256 additionalVotes);
     event VoteCast(address indexed voter,uint256 indexed proposalId,bool support,uint256 votingPower,uint256 profiAmount);
@@ -109,7 +36,7 @@ contract DaoSystem is Governor {
     mapping(uint256 => Voting) public votings;
     mapping(address => User) users;
 
-    constructor() Governor("DaoSystem") {
+    constructor() {
         // Создание стартапы с тикетом PROFI и токеном RTKCoin
         Professional = new Token("Professional", "PROFI", 100_000);
         RTKCoin = new Token("RTKCoin", "RTK", 20_000_000);
@@ -176,53 +103,16 @@ contract DaoSystem is Governor {
         users[msg.sender].wrapTokenBalance += amount;
     }
 
+    // Функция создания предложения
     function propose(
-        ProposalType proposalType,
-        string memory description,
-        QuorumType quorumType,
-        address targetAddress, // Адрес участника или стартапа
-        uint256 targetAmount // Сумма инвестиций или новый параметр
-    ) public onlyMember {
-
-        // Создаем массивы targets, values и calldatas
-        address[] memory targets = new address[](1);
-        uint256[] memory values = new uint256[](1);
-        bytes[] memory calldatas = new bytes[](1);
-
-        targets[0] = address(this); // Договор DAO
-        values[0] = 0; // Нет перевода ETH
-
-        // Заполняем массивы в зависимости от типа предложения
-        if (proposalType == ProposalType.INVEST_NEW_STARTUP) {
-            calldatas[0] = abi.encodeWithSignature("newStartupInvestment(address, uint256)", targetAddress, targetAmount);
-        }
-        else if (proposalType == ProposalType.ADD_INVESTMENT) {
-            calldatas[0] = abi.encodeWithSignature("startupInvestment(address, uint256)", targetAddress, targetAmount);
-        }
-        else if (proposalType == ProposalType.ADD_MEMBER) {
-            calldatas[0] = abi.encodeWithSignature("addUserToDao(address)", targetAddress);
-        }
-        else if (proposalType == ProposalType.REMOVE_MEMBER) {
-            calldatas[0] = abi.encodeWithSignature("removeUserFromDao(address)", targetAddress);
-        }
-        else if (proposalType == ProposalType.MANAGE_WRAP_TOKEN) {
-            calldatas[0] = abi.encodeWithSignature("executeTokenChange(address,uint256)", targetAddress, targetAmount);
-        }
-        _createProposal(targets, values, calldatas, description, quorumType, proposalType, targetAddress, targetAmount);
-    }
-
-    // Внутренняя функция создания предложения
-    function _createProposal(
-        address[] memory targets,
-        uint256[] memory values,
-        bytes[] memory calldatas,
         string memory description,
         QuorumType quorumType,
         ProposalType proposalType,
         address targetAddress, // Адрес участника или стартапа
         uint256 targetAmount // Сумма инвестиций или новый параметр
-    ) internal returns (uint256) {
-        uint256 proposalId = super.propose(targets, values, calldatas, description);
+    ) public returns (uint256) {
+        proposalCount++;
+        uint256 proposalId = proposalCount;
         
         proposals[proposalId] = Proposal({
             id: proposalId,
@@ -260,8 +150,6 @@ contract DaoSystem is Governor {
     function startVoting(uint256 proposalId, uint256 timeForVoting) public {
         Proposal storage proposal = proposals[proposalId];
         proposal.onVoting = true;
-        require(proposal.proposer == msg.sender, "Only proposer can start voting");
-        require(votings[proposal.votingId].startTime == 0, "Voting already started");
 
         Voting storage voting = votings[proposalId];
         voting.startTime = block.timestamp; // Set startTime to current timestamp
@@ -342,8 +230,6 @@ contract DaoSystem is Governor {
     // Функция для отмены голосования
     function cancelVoting(uint256 proposalId) public onlyMember {
         Voting storage voting = votings[proposalId];
-        // require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
-        // require(msg.sender == voting.initiator, "Only initiator can cancel");
 
         // Возвращаем токены всем проголосовавшим участникам
         for (uint i = 0; i < voting.voters.length; i++) {
@@ -417,41 +303,6 @@ contract DaoSystem is Governor {
         revert("Invalid quorum conditions");
     }
 
-    // Дальше вся муть нужная для компиляции контракта, без нее Governor ругается
-
-    function COUNTING_MODE() external pure override returns (string memory) {
-        return "support=bravo&quorum=against,for,abstain";
-    }
-
-    function CLOCK_MODE() pure public override(Governor) returns (string memory) {
-        return "mode=blocknumber&from=default";
-    }
-
-    function clock() view public override(Governor) returns (uint48) {
-        return uint48(block.timestamp);
-    }
-
-    function quorum(uint256 /*timepoint*/) public pure override returns (uint256) {
-        // Для совместимости с интерфейсом, возвращаем минимальное значение
-        return 1;
-    }
-
-    function votingDelay() public pure override returns (uint256) {
-        return 1; // 1 block delay
-    }
-
-    function votingPeriod() pure public override returns (uint256) {
-        return 150; // ~5 min in blocks
-    }
-
-    function _getVotes(
-        address account,
-        uint256 timepoint,
-        bytes memory /* params */
-    ) internal view override(Governor) returns (uint256) {
-        return Professional.getPastVotes(account, timepoint);
-    }
-
     // Обновляем _countVote
     function _countVote(
         uint256 proposalId,
@@ -459,13 +310,13 @@ contract DaoSystem is Governor {
         uint8 support,
         uint256 weight,
         bytes memory
-    ) internal override returns(uint256) {
+    ) internal returns(uint256) {
         Voting storage voting = votings[proposalId];
         require(!hasVoted(proposalId, account), "Already voted");
         
-        if (support == 1) { // For
+        if (support == 1) {
             voting.votesFor += weight / 3;
-        } else if (support == 0) { // Against
+        } else if (support == 0) {
             voting.votesAgainst += weight / 3;
         }
         
@@ -474,19 +325,12 @@ contract DaoSystem is Governor {
         return weight;
     }
 
-    function _quorumReached(uint256 proposalId) internal view override returns (bool) {
-        Voting storage voting = votings[proposalId];
-        uint256 totalMembers = 0; // You should track total members dynamically
-        return voting.votesFor + voting.votesAgainst >= totalMembers / 2 + 1;
-    }
-
-    function _voteSucceeded(uint256 proposalId) internal view override returns (bool) {
+    function _voteSucceeded(uint256 proposalId) internal view returns (bool) {
         Voting storage voting = votings[proposalId];
         return voting.votesFor > voting.votesAgainst;
     }
 
-    function hasVoted(uint256 proposalId, address account) public view override returns (bool) {
-        // Check if the account has already voted by looking at the `votes` mapping
+    function hasVoted(uint256 proposalId, address account) public view returns (bool) {
         return votes[proposalId][account] > 0;
     }
 }
