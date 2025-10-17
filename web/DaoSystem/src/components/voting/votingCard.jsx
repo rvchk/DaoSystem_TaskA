@@ -50,11 +50,6 @@ export default function VotingCard({ voting }) {
     return () => clearInterval(interval);
   }, [smartContract]);
 
-  const copyProposeId = () => {
-    navigator.clipboard.writeText(voting?.id);
-    alert("ID предложения скопирован");
-  };
-
   const copyUserAddress = () => {
     navigator.clipboard.writeText(voting.initiator);
     alert("Адрес пользователя скопирован");
@@ -70,10 +65,7 @@ export default function VotingCard({ voting }) {
         )}
         <h3>Описание: {votingInfo?.description}</h3>
         <p>
-          ID голосования: {voting?.id.toString().slice(0, 8)}...
-          <a onClick={copyProposeId} className='copyButton'>
-            Копировать
-          </a>
+          ID голосования: {voting?.id.toString()}
         </p>
         Создатель:{" "}
         <button className='copyButton' onClick={copyUserAddress}>

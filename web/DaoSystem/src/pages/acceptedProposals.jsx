@@ -11,11 +11,9 @@ export default function AcceptedProposals() {
   async function fetchVotingDetails() {
     let details = [];
     const currentVotings = await smartContract.getAcceptedProposals();
-    console.log(currentVotings);
     for (let i = 0; i < currentVotings.length; i++) {
       details.push(currentVotings[i].returnValues);
     }
-    console.log(details);
     return details;
   }
 
@@ -24,7 +22,6 @@ export default function AcceptedProposals() {
       fetchVotingDetails();
     }
   }, [smartContract]);
-  console.log(votings);
 
   return (
     <>

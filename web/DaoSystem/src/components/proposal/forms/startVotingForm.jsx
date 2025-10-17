@@ -23,7 +23,6 @@ export default function StartVotingForm() {
       proposeIdRef.current.value = "";
       votingTimeRef.current.value = "";
     } catch (e) {
-      console.log(e);
       alert("Неправильное id предложения");
     }
   };

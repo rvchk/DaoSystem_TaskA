@@ -31,9 +31,9 @@ export default function CreateProposalForm() {
     }
 
     await smartContract.createPropose(
-      currentPropose,
       descriptionRef.current.value,
       quorumType || 2,
+      currentPropose,
       addressRef.current.value,
       amount
     );

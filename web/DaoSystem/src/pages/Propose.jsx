@@ -11,7 +11,6 @@ function Propose() {
   const [userProposals, setUserProposals] = useState("");
 
   useEffect(() => {
-    console.log(user?.status);
     if (user?.status != "1" && user?.status != undefined) {
       alert("Вы не участник DAO");
       window.history.go(-1);

@@ -6,10 +6,6 @@ export default function ProposalCard({ proposal }) {
   const { smartContract } = useData();
   const [name, setName] = useState();
   const [proposalInfo, setProposalInfo] = useState();
-  const copyProposeId = () => {
-    navigator.clipboard.writeText(proposal.id);
-    alert("ID предложения скопирован");
-  };
 
   const getUserName = async () => {
     const user = await smartContract.getUserObject(proposal.proposer);
@@ -53,10 +49,7 @@ export default function ProposalCard({ proposal }) {
           {proposalInfo?.onVoting && <p>На голосовании</p>}
           {proposal.executed && <p>Выполнено</p>}
           <span>
-            ID: {proposal.id.toString().slice(0, 8)}...
-            <a onClick={copyProposeId} className='copyButton'>
-              Копировать
-            </a>
+            ID: {proposal.id}
           </span>
           <div>
             <p>
