@@ -11,7 +11,7 @@ export function DataProvider({ children }) {
   const [smartContract, setSmartContract] = useState();
   const [user, setUser] = useState();
   const selectedAccount = localStorage.getItem("selectedAcc") || "";
-  const ownerAddress = "0xda82d8e188e355c380d77616B2b63b0267aA68eD";
+  const ownerAddress = "0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C";
 
   useEffect(() => {
     if (!localStorage.getItem("contractId")) {

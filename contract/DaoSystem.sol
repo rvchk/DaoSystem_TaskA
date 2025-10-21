@@ -5,11 +5,11 @@ import "./DaoTypes.sol";
 import { Token } from "./Token.sol";
 
 contract DaoSystem {
-    address internal Tom = 0xda82d8e188e355c380d77616B2b63b0267aA68eD;
-    address internal Ben = 0xa0Fddc85DA6Fbe53D2e7d55cbDa9a22c3620816C;
-    address internal Rick = 0x58E4a1126170CfA7CCF016a9362AE1a9f1c70914;
-    address internal Jack = 0xB6458438e80Ad9bd3DD3DdB5FB1942a139C1ffD3;
-    address internal Fond = 0x812F7c9C267B3B24fC81d8f6CDdb9482D2b992df;
+    address internal Tom = 0x990221C5080023298D2abE4C43e07d7D844894a9;
+    address internal Ben = 0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C;
+    address internal Rick = 0x2cE921Bff1c951914B062f2557d6914521bb8E77;
+    address internal Jack = 0xb7ec4240d2A4e5bfB8c398F13e7c47c4138b1A44;
+    address internal Fond = 0x942aB5420dBd2838D89da4cfdDfE7c7D3C59BFC2;
 
     Token internal Professional;
     Token internal RTKCoin;
@@ -20,6 +20,7 @@ contract DaoSystem {
     uint256 public WrapTokenPrice = 1; // Цена wrap token = 1 ETH
     uint256 public proposalCount = 0; // Счетчик предложений, вместо рандомного числа через super.propose
 
+    // indexed нужен, чтобы можно было отфильтровать ивенты на Фронтенде, например Создание Предложения, только от определенного адреса
     event VoteSupported(address indexed supporter, address indexed voter, uint256 indexed proposalId, uint256 additionalVotes);
     event VoteCast(address indexed voter,uint256 indexed proposalId,bool support,uint256 votingPower,uint256 profiAmount);
     event ProposalCreated(address indexed creator, uint256 id, ProposalType proposalType, string description, address targetAddress, uint256 targetAmount, bool indexed executed);
@@ -28,13 +29,13 @@ contract DaoSystem {
     event NewStartupInvestment(address indexed startup, uint256 amount);
     event StartupInvestment(address indexed startup, uint256 amount);
 
-    // Данные
+    // Все mapping
     mapping(uint256 => mapping(address => VoteSupport)) public voteSupports;
     mapping(uint256 => mapping(address => uint256)) public votes;
     mapping(VotingStatus => uint256[]) public votingProposals;
     mapping(uint256 => Proposal) public proposals;
     mapping(uint256 => Voting) public votings;
-    mapping(address => User) users;
+    mapping(address => User) public users;
 
     constructor() {
         // Создание стартапы с тикетом PROFI и токеном RTKCoin
@@ -67,30 +68,22 @@ contract DaoSystem {
         users[memberAddress].status = UserStatus.NOT_MEMBER;
     }
 
+    // При инициализации Mapping, солидити сам создает функцию, для получения этого поля, тоесть эта функция не нужна
     // Функция для получения данных о пользователе, принимает адрес пользователя
-    function getUser(address userAddress) public view returns(User memory) {
-        return users[userAddress];
-    }
+    // function getUser(address userAddress) public view returns(User memory) {
+    //     return users[userAddress];
+    // }
 
     // Вспомогательная функция, принимает адрес пользователя, возвращает его баланс Profi
     function getBalanceProfi(address user) public view returns(uint256) {
         return Professional.balanceOf(user);
     }
 
-    // Фукнция для новых вложений в стартап
-    function newStartupInvestment(address startupAddress, uint256 amount) internal {
-        emit NewStartupInvestment(startupAddress, amount);
-    }
-
-    // Фукнция для вложений в стартап
-    function startupInvestment(address startupAddress, uint256 amount) internal {
-        emit StartupInvestment(startupAddress, amount);
-    }
-
     // Функция для покупки wrap за eth
     function buyWrapWithEth(uint256 amount) public payable {
         uint256 requiredEth = amount * WrapTokenPrice;
         require(RTKCoin.balanceOf(address(this)) >= requiredEth, "Not enough WRAP tokens in contract");
+        
         RTKCoin.transferTokens(address(this), msg.sender, requiredEth * 10 ** RTKCoin.decimals());
         users[msg.sender].wrapTokenBalance += amount;
     }
@@ -183,7 +176,7 @@ contract DaoSystem {
         // Вычитаем токены Profi у пользователя
         Professional.transferTokens(msg.sender, address(this), tokenAmount * 10 ** Professional.decimals());
 
-        _countVote(proposalId, msg.sender, support ? 1 : 0, votingPower, "");
+        countVote(proposalId, msg.sender, support ? 1 : 0, votingPower);
         voting.voters.push(msg.sender);
 
         emit VoteCast(msg.sender, proposalId, support, votingPower, Professional.balanceOf(msg.sender));
@@ -208,13 +201,9 @@ contract DaoSystem {
 
         // Проверяем, как проголосовал пользователь (за или против)
         bool voterSupport = voteSupports[proposalId][voter].support;
-        if (voterSupport) {
-            // Если пользователь голосовал "За"
-            voting.votesFor += additionalVotes;
-        } else {
-            // Если пользователь голосовал "Против"
-            voting.votesAgainst += additionalVotes;
-        }
+        voterSupport
+            ? voting.votesFor += additionalVotes 
+            : voting.votesAgainst += additionalVotes;
 
         // Записываем данные о поддержке
         voteSupports[proposalId][msg.sender] = VoteSupport({
@@ -237,13 +226,10 @@ contract DaoSystem {
             uint256 voteAmount = votes[proposalId][voter];
             
             if (voteAmount > 0) {
-                // Обнуляем запись о голосе
-                // delete votes[proposalId][voter];
                 Professional.transferFrom(voting.initiator, voter, voteAmount);
             }
         }
     
-        // Меняем статус голосования
         voting.status = VotingStatus.DELETED;
         proposals[proposalId].onVoting = false;        
     }
@@ -253,10 +239,10 @@ contract DaoSystem {
         Proposal storage proposal = proposals[proposalId];
         Voting storage voting = votings[proposalId];
         
-        if (quorumReached(proposalId) && _voteSucceeded(proposalId)) {
+        if (quorumReached(proposalId) && voteSucceeded(proposalId)) {
             voting.status = VotingStatus.APPROVED;
             proposal.executed = true;
-            _executeProposal(proposalId);
+            execute(proposalId);
             emit ProposalExecuted(proposalId, voting.status);
         } else {
             voting.status = VotingStatus.REJECTED;
@@ -264,14 +250,14 @@ contract DaoSystem {
     }
 
     // Внутренняя функция выполнения предложения
-    function _executeProposal(uint256 proposalId) internal {
+    function execute(uint256 proposalId) internal {
         Proposal storage proposal = proposals[proposalId];
-        
+
         if (proposal.proposalType == ProposalType.INVEST_NEW_STARTUP) {
-            newStartupInvestment(proposal.targetAddress, proposal.targetAmount);
+            emit NewStartupInvestment(proposal.targetAddress, proposal.targetAmount);
         }
         else if (proposal.proposalType == ProposalType.ADD_INVESTMENT) {
-            startupInvestment(proposal.targetAddress, proposal.targetAmount);
+            emit StartupInvestment(proposal.targetAddress, proposal.targetAmount);
         }
         else if (proposal.proposalType == ProposalType.ADD_MEMBER) {
             users[proposal.targetAddress].status = UserStatus.MEMBER;
@@ -303,29 +289,26 @@ contract DaoSystem {
         revert("Invalid quorum conditions");
     }
 
-    // Обновляем _countVote
-    function _countVote(
+    function countVote(
         uint256 proposalId,
         address account,
         uint8 support,
-        uint256 weight,
-        bytes memory
+        uint256 weight
     ) internal returns(uint256) {
         Voting storage voting = votings[proposalId];
         require(!hasVoted(proposalId, account), "Already voted");
         
         if (support == 1) {
             voting.votesFor += weight / 3;
-        } else if (support == 0) {
+        } else {
             voting.votesAgainst += weight / 3;
         }
         
         votes[proposalId][account] = weight;
-        
         return weight;
     }
 
-    function _voteSucceeded(uint256 proposalId) internal view returns (bool) {
+    function voteSucceeded(uint256 proposalId) internal view returns (bool) {
         Voting storage voting = votings[proposalId];
         return voting.votesFor > voting.votesAgainst;
     }

@@ -7,16 +7,19 @@ export default class SmartContract {
     }
     this.selectedAccount = selectedAccount;
     this.contract = contract;
+    this.func = contract.methods;
   }
 
-  async getBalanceProfi(userAddress) {
-    return await this.contract.methods.getBalanceProfi(userAddress).call();
-  }
+  // Методы с call()
+  getBalanceProfi = async (address) => this.func.getBalanceProfi(address).call();
+  getUserObject = async (address) => this.func.users(address).call();
+  fetchUserProposals = async () => this.func.getUserProposals(this.selectedAccount).call();
+  getProposal = async (id) => this.func.getProposal(id).call();
+  getWrapExchange = async () => this.func.RtkExchangeRate().call();
+  getVotes = async (id) => this.func.votings(id).call();
+  getProposalInfo = async (id) => this.func.proposals(id).call();
 
-  async getUserObject(userAddress) {
-    return await this.contract.methods.getUser(userAddress).call();
-  }
-
+  // Методы с send()
   async buyWrapTokensByProfi(amount) {
     return await this.contract.methods.buyWrapWithProfi(amount).send({
       from: this.selectedAccount
@@ -89,22 +92,10 @@ export default class SmartContract {
     }
   }
 
-  async fetchUserProposals() {
-    return await this.contract.methods.getUserProposals(this.selectedAccount).call();
-  }
-
-  async getProposal(proposalId) {
-    return await this.contract.methods.getProposal(proposalId).call();
-  }
-
   async startVoting(proposalId, votingTime) {
     await this.contract.methods
       .startVoting(proposalId, votingTime)
       .send({ from: this.selectedAccount });
-  }
-
-  async getWrapExchange() {
-    return await this.contract.methods.RtkExchangeRate().call();
   }
 
   async cancelVoting(id) {
@@ -115,14 +106,6 @@ export default class SmartContract {
     await this.contract.methods
       .castVote(proposalId, support, tokenAmount)
       .send({ from: this.selectedAccount });
-  }
-
-  async getVotes(id) {
-    return await this.contract.methods.votings(id).call();
-  }
-
-  async getProposalInfo(id) {
-    return await this.contract.methods.proposals(id).call();
   }
 
   async deleteProposal(id) {
