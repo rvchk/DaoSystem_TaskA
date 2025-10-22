@@ -1,4 +1,3 @@
-import React from "react";
 import ProposalCard from "./ProposalCard";
 
 export default function AllUserProposals({ userProposals }) {

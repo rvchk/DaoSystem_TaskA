@@ -8,9 +8,11 @@ export default class SmartContract {
     this.selectedAccount = selectedAccount;
     this.contract = contract;
     this.func = contract.methods;
+    this.events = contract.getPastEvents.bind(contract);
   }
 
-  // Методы с call()
+
+  // Методы call()
   getBalanceProfi = async (address) => this.func.getBalanceProfi(address).call();
   getUserObject = async (address) => this.func.users(address).call();
   fetchUserProposals = async () => this.func.getUserProposals(this.selectedAccount).call();
@@ -19,100 +21,40 @@ export default class SmartContract {
   getVotes = async (id) => this.func.votings(id).call();
   getProposalInfo = async (id) => this.func.proposals(id).call();
 
-  // Методы с send()
-  async buyWrapTokensByProfi(amount) {
-    return await this.contract.methods.buyWrapWithProfi(amount).send({
+
+  // Методы send()
+  sendTransaction = async (func, ...params) => {
+    await this.func[func](...params).send({
       from: this.selectedAccount
-    });
+    })
   }
 
-  async buyWrapTokensByEth(amount) {
-    return await this.contract.methods.buyWrapWithEth(amount).send({
+  buyWrapTokensByProfi = async (amount) => this.sendTransaction("buyWrapWithProfi", amount)
+  supportVote = async (id, voter, amount) => this.sendTransaction("supportVote", id, voter, amount)
+  startVoting = async (id, votingTime) => this.sendTransaction("startVoting", id, votingTime)
+  cancelVoting = async (id) => this.sendTransaction("cancelVoting", id)
+  castVote = async (id, support, tokenAmount) => this.sendTransaction("castVote", id, support, tokenAmount)
+  deleteProposal = async (id) => this.sendTransaction("deleteProposal", id)
+  executeProposal = async (id, creator) => this.sendTransaction("executeProposal", id, creator)
+
+  createPropose = async (description, quorumType, currentPropose, memberOrStartup, amountOrParameter) => {
+    return this.sendTransaction("propose", description, (currentPropose <= 1 ? 2 : quorumType), currentPropose, memberOrStartup, amountOrParameter)
+  }
+
+  buyWrapTokensByEth = async (amount) => {
+    return this.func.buyWrapWithEth(amount).send({
       from: this.selectedAccount,
       value: ethers.parseEther(amount.toString())
     });
   }
 
-  async getUserPastProposals() {
-    return await this.contract.getPastEvents("ProposalCreated", {
-      filter: { creator: this.selectedAccount, executed: "false" },
-      fromBlock: 0,
-      toBlock: "latest"
-    });
-  }
 
-  async getCurrentVotings() {
-    return await this.contract.getPastEvents("VotingStarted", {
-      filter: { votingStatus: "3" },
-      fromBlock: 0,
-      toBlock: "latest"
-    });
-  }
+  // Методы PastEvents, обработка ивентов
+  getPastEvents = async (func, filter) => this.events(func, { filter: filter, fromBlock: 0, toBlock: "latest" });
 
-  async getAllVotings() {
-    return await this.contract.getPastEvents("VotingStarted", {
-      fromBlock: 0,
-      toBlock: "latest"
-    });
-  }
-
-  async getInvestment() {
-    return await this.contract.getPastEvents("NewStartupInvestment", {
-      fromBlock: 0,
-      toBlock: "latest"
-    });
-  }
-
-  async getAcceptedProposals() {
-    return await this.contract.getPastEvents("ProposalExecuted", {
-      fromBlock: 0,
-      toBlock: "latest"
-    });
-  }
-
-  async supportVote(id, voter, amount) {
-    await this.contract.methods.supportVote(id, voter, amount).send({ from: this.selectedAccount });
-  }
-
-  async createPropose(currentPropose, description, quorumType, memberOrStartup, amountOrParameter) {
-    // Здесь тип кворума weighted, потому что голосование токенами
-    if (currentPropose == 0 || currentPropose == 1) {
-      const result = await this.contract.methods
-        .propose(description, 2, currentPropose, memberOrStartup, amountOrParameter)
-        .send({ from: this.selectedAccount });
-      return result.events.ProposalCreated.returnValues;
-    }
-
-    // Тут можно выбрать тип достижения кворума
-    else {
-      const result = await this.contract.methods
-        .propose(currentPropose, description, quorumType, memberOrStartup, amountOrParameter)
-        .send({ from: this.selectedAccount });
-      return result.events.ProposalCreated.returnValues;
-    }
-  }
-
-  async startVoting(proposalId, votingTime) {
-    await this.contract.methods
-      .startVoting(proposalId, votingTime)
-      .send({ from: this.selectedAccount });
-  }
-
-  async cancelVoting(id) {
-    await this.contract.methods.cancelVoting(id).send({ from: this.selectedAccount });
-  }
-
-  async castVote(proposalId, support, tokenAmount) {
-    await this.contract.methods
-      .castVote(proposalId, support, tokenAmount)
-      .send({ from: this.selectedAccount });
-  }
-
-  async deleteProposal(id) {
-    await this.contract.methods.deleteProposal(id).send({ from: this.selectedAccount });
-  }
-
-  async executeProposal(id, creator) {
-    await this.contract.methods.executeProposal(id).send({ from: creator });
-  }
+  getUserPastProposals = async () => this.getPastEvents("ProposalCreated", { creator: this.selectedAccount, executed: "false" })
+  getCurrentVotings = async () => this.getPastEvents("VotingStarted", { votingStatus: "3" })
+  getAllVotings = async () => this.getPastEvents("VotingStarted", {})
+  getInvestment = async () => this.getPastEvents("NewStartupInvestment", {})
+  getAcceptedProposals = async () => this.getPastEvents("ProposalExecuted", {})
 }
