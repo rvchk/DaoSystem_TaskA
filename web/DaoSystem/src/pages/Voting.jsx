@@ -15,7 +15,6 @@ export default function Voting() {
       details.push(currentVotings[i].returnValues);
     }
     setVotings(details);
-    return details;
   }
 
   useEffect(() => {
@@ -29,7 +28,11 @@ export default function Voting() {
       <h1>Голосование</h1>
       <VotingForm />
       <h2>Все предложения на голосовании</h2>
-      <AllCurrentVotings votings={votings} />
+      <div className='AllVotings'>
+        {votings?.map((voting) => (
+          <VotingCard voting={voting} key={voting.id} />
+        ))}
+      </div>
       <UserInfo />
     </>
   );

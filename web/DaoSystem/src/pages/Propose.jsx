@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useData } from "../data/DataProvider";
-import AllUserProposals from "../components/proposal/AllUserProposals";
 import StartVotingForm from "../components/proposal/forms/startVotingForm";
 import CreateProposalForm from "../components/proposal/forms/createProposalForm";
 import ProposalCard from "../components/proposal/ProposalCard";

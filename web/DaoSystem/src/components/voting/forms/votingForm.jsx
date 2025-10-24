@@ -31,10 +31,6 @@ export default function VotingForm() {
       alert("Заполните все поля!");
       return;
     }
-    if (votingAmount <= 0) {
-      alert("Введите положительное значение!");
-      return;
-    }
     await smartContract.supportVote(votingId.current.value, addressRef.current.value, votingAmount);
   };
 
@@ -76,7 +72,7 @@ export default function VotingForm() {
           </Button>
         </Stack>
       ) : (
-        <Button variant='secondary' onClick={supportVote} style={{ marginTop: "10px" }}>
+        <Button variant='secondary' onClick={supportVote}>
           Поддержать
         </Button>
       )}

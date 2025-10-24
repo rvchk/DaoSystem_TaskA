@@ -2,8 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useData } from "../../data/DataProvider";
 
 export const ProposalDetails = ({ proposal }) => {
-  const [user, setUser] = useState();
   const { smartContract } = useData();
+  const [user, setUser] = useState();
+
+  const shortAddress = proposal.targetAddress.toString().slice(0, 8);
 
   const getUser = useCallback(async () => {
     const user = await smartContract.getUserObject(proposal.targetAddress);
@@ -27,7 +29,7 @@ export const ProposalDetails = ({ proposal }) => {
         <div>
           <p>Количество инвестиций: {proposal.targetAmount} ETH</p>
           <span>
-            Адрес: {proposal.targetAddress.toString().slice(0, 8)}...
+            Адрес: {shortAddress}...
             <a onClick={copyUserAddress} className='copyButton'>
               Копировать
             </a>
@@ -41,7 +43,7 @@ export const ProposalDetails = ({ proposal }) => {
               Имя пользователя: <strong>{user?.name}</strong>
             </p>
             <span>
-              Адрес: {proposal.targetAddress.toString().slice(0, 8)}...
+              Адрес: {shortAddress}...
               <a onClick={copyUserAddress} className='copyButton'>
                 Копировать
               </a>
@@ -50,10 +52,15 @@ export const ProposalDetails = ({ proposal }) => {
         ))}
       {proposal.proposalType == "4" && (
         <div>
-          <p>Адрес токена: {proposal.targetAddress}</p>
           <p>
             Новая цена: <strong>{proposal.targetAmount}</strong>
           </p>
+          <span>
+            Адрес: {shortAddress}...
+            <a onClick={copyUserAddress} className='copyButton'>
+              Копировать
+            </a>
+          </span>
         </div>
       )}
     </div>
