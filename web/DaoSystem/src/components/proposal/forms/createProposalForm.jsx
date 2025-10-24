@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Button, Container, Form, Row } from "react-bootstrap";
+import { Button, Form, Row } from "react-bootstrap";
 import { useData } from "../../../data/DataProvider";
 
 export default function CreateProposalForm() {
@@ -61,10 +61,10 @@ export default function CreateProposalForm() {
       </Form.Select>
       <Form.Control type='text' placeholder='Описание' ref={descriptionRef} />
       <Form.Control type='text' placeholder='Нужный адрес' ref={addressRef} />
-      {currentPropose != 2 && currentPropose != 3 && (
+      {currentPropose <= 1 && currentPropose == 4 && (
         <Form.Control type='number' placeholder='Нужное количество' ref={amountRef} />
       )}
-      {currentPropose != 0 && currentPropose != 1 && (
+      {currentPropose > 1 && (
         <Row className='mb-3 justify-content-center'>
           <Form.Label>Тип кворума:</Form.Label>
           <Form.Select

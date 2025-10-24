@@ -78,7 +78,7 @@
 			{
 				"indexed": true,
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			},
 			{
@@ -122,7 +122,7 @@
 			{
 				"indexed": true,
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			},
 			{
@@ -165,7 +165,7 @@
 			{
 				"indexed": true,
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			},
 			{
@@ -263,7 +263,7 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "memberAddress",
+				"name": "user",
 				"type": "address"
 			},
 			{
@@ -312,7 +312,7 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			}
 		],
@@ -325,7 +325,7 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			},
 			{
@@ -361,7 +361,7 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			}
 		],
@@ -378,11 +378,16 @@
 				"type": "address"
 			}
 		],
-		"name": "getBalanceProfi",
+		"name": "getUserBalance",
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "wrap",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "profi",
 				"type": "uint256"
 			}
 		],
@@ -393,7 +398,7 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			},
 			{
@@ -450,11 +455,6 @@
 				"internalType": "string",
 				"name": "description",
 				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "votingId",
-				"type": "uint256"
 			},
 			{
 				"internalType": "bool",
@@ -528,7 +528,7 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			}
 		],
@@ -547,7 +547,7 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "memberAddress",
+				"name": "user",
 				"type": "address"
 			}
 		],
@@ -560,7 +560,7 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			},
 			{
@@ -578,7 +578,7 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			},
 			{
@@ -621,11 +621,6 @@
 				"internalType": "enum UserStatus",
 				"name": "status",
 				"type": "uint8"
-			},
-			{
-				"internalType": "uint256",
-				"name": "wrapTokenBalance",
-				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -648,7 +643,7 @@
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "proposalId",
+				"name": "id",
 				"type": "uint256"
 			},
 			{
@@ -728,6 +723,11 @@
 		],
 		"name": "votings",
 		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "id",
+				"type": "uint256"
+			},
 			{
 				"internalType": "address",
 				"name": "initiator",

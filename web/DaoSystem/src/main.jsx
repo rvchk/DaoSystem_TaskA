@@ -1,3 +1,4 @@
+import FetchAccounts from "./components/shared/FetchAccounts.jsx";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
 import AcceptedProposals from "./pages/acceptedProposals.jsx";
 import { DataProvider } from "./data/DataProvider.jsx";
@@ -25,6 +26,7 @@ createRoot(document.getElementById("root")).render(
           <Route key={index} path={route.path} Component={route.component} />
         ))}
       </Routes>
+      <FetchAccounts />
     </BrowserRouter>
   </DataProvider>
 );

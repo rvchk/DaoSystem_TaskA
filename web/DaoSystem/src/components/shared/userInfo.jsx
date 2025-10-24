@@ -4,16 +4,22 @@ import { Link } from "react-router-dom";
 
 export const UserInfo = () => {
   const { smartContract, selectedAccount, user } = useData();
-  const [profi, setProfi] = useState();
-
-  async function getBalances() {
-    const profiBalance = await smartContract.getBalanceProfi(selectedAccount);
-    setProfi(profiBalance);
+  const [balance, setBalance] = useState({
+    profi: 0,
+    wrap: 0
+  })
+  
+  async function getUserBalance() {
+    const balance = await smartContract.getUserBalance(selectedAccount);
+    setBalance({
+      profi: balance.profi || 0,
+      wrap: balance.wrap || 0
+    });
   }
 
   useEffect(() => {
     if (smartContract) {
-      getBalances();
+      getUserBalance();
     }
   }, [smartContract, selectedAccount]);
 
@@ -23,8 +29,8 @@ export const UserInfo = () => {
         {user?.name}
       </Link>
       <div className='userInfoBalances'>
-        <p>Profi: {profi?.toString().slice(0, -12)}</p>
-        <p>Wrap: {user?.wrapTokenBalance}</p>
+        <p>Profi: {balance.profi}</p>
+        <p>Wrap: {balance.wrap}</p>
       </div>
     </div>
   );

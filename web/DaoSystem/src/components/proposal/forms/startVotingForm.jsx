@@ -13,7 +13,7 @@ export default function StartVotingForm() {
   }
 
   const startVoting = () => {
-    if (proposeIdRef.current.value == 0 || !votingTimeRef.current.value) {
+    if (!proposeIdRef.current.value || !votingTimeRef.current.value) {
       alert("Заполните все поля");
       return;
     }
@@ -22,7 +22,7 @@ export default function StartVotingForm() {
       smartContract.startVoting(proposeIdRef.current.value, timeForVoting);
       proposeIdRef.current.value = "";
       votingTimeRef.current.value = "";
-    } catch (e) {
+    } catch {
       alert("Неправильное id предложения");
     }
   };

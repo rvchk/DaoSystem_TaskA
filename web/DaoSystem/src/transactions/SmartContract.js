@@ -13,7 +13,7 @@ export default class SmartContract {
 
 
   // Методы call()
-  getBalanceProfi = async (address) => this.func.getBalanceProfi(address).call();
+  getUserBalance = async (address) => this.func.getUserBalance(address).call();
   getUserObject = async (address) => this.func.users(address).call();
   fetchUserProposals = async () => this.func.getUserProposals(this.selectedAccount).call();
   getProposal = async (id) => this.func.getProposal(id).call();

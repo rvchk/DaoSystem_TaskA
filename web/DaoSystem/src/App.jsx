@@ -1,5 +1,4 @@
 import { useData } from "./data/DataProvider";
-import FetchAccounts from "./components/shared/FetchAccounts";
 import { Link } from "react-router-dom";
 
 function App() {
@@ -23,7 +22,6 @@ function App() {
         </Link>
       </div>
       <p>Изменение аккаунтов происходит через МетаМаск</p>
-      <FetchAccounts />
     </div>
   );
 }

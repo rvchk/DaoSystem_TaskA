@@ -1,29 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useData } from "../data/DataProvider";
-import FetchAccounts from "../components/shared/FetchAccounts";
-import { GoBackButton } from "../components/shared/goBackButton";
 import Button from "react-bootstrap/Button";
 import { Container, Form, Image, InputGroup, Stack } from "react-bootstrap";
 
 export default function Profile() {
-  const wrapAmountRef = useRef();
   const { smartContract, selectedAccount, user } = useData();
   const [selectedValue, setSelectedValue] = useState();
   const [exchange, setExchange] = useState(0);
   const [currentAmount, setCurrentAmount] = useState("");
-  const [profi, setProfi] = useState();
+  const [balance, setBalance] = useState({
+    profi: 0,
+    wrap: 0
+  })
+  
+  async function getUserBalance() {
+    const balance = await smartContract.getUserBalance(selectedAccount);
+    setBalance({
+      profi: balance.profi || 0,
+      wrap: balance.wrap || 0
+    });
+  }
 
   useEffect(() => {
     if (smartContract) {
-      getBalances();
+      getUserBalance();
       getExchange();
     }
   }, [smartContract]);
-
-  async function getBalances() {
-    const profiBalance = await smartContract.getBalanceProfi(selectedAccount);
-    setProfi(profiBalance);
-  }
 
   async function getExchange() {
     const result = await smartContract.getWrapExchange();
@@ -33,11 +36,10 @@ export default function Profile() {
   const buyWrap = async () => {
     if (selectedValue == "eth") {
       await smartContract.buyWrapTokensByEth(currentAmount);
-      location.reload();
     } else {
       await smartContract.buyWrapTokensByProfi(currentAmount);
-      location.reload();
     }
+    await getUserBalance()
   };
 
   return (
@@ -47,8 +49,8 @@ export default function Profile() {
         <Container>
           <h1>{user?.name}</h1>
           <h2>{user?.status == 1 ? "Участник DAO" : "Не участник DAO"} </h2>
-          <h2>Профи: {profi?.toString().slice(0, -12)}</h2>
-          <h2>Врап: {user?.wrapTokenBalance}</h2>
+          <h2>Профи: {balance.profi}</h2>
+          <h2>Врап: {balance.wrap}</h2>
         </Container>
       </Stack>
       <h2>Купить врап токены</h2>
@@ -63,7 +65,6 @@ export default function Profile() {
             placeholder='Сколько врап?'
             onChange={(e) => setCurrentAmount(e.target.value)}
             value={currentAmount}
-            ref={wrapAmountRef}
             type='number'
             required
           />
@@ -73,8 +74,6 @@ export default function Profile() {
           Купить
         </Button>
       </Stack>
-      <FetchAccounts />
-      <GoBackButton />
     </>
   );
 }
