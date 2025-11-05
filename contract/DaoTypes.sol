@@ -37,11 +37,11 @@ struct User {
     string name;
     address userAddress;
     UserStatus status;
-    uint256 wrapTokenBalance;
 }
 
 // Структура голосования
 struct Voting {
+    uint256 id;
     address initiator;
     string description;
     uint256 startTime;
@@ -55,7 +55,7 @@ struct Voting {
 
 // Структура голоса поддержки
 struct VoteSupport {
-    uint256 proposalId;
+    uint256 id;
     address voter; // Адрес пользователя, чей голос поддерживается
     uint256 wrapTokens; // Количество wrap токенов, использованных для поддержки
     bool support; // Голос за или против
@@ -66,7 +66,6 @@ struct Proposal {
     uint256 id;
     address proposer;
     string description;
-    uint256 votingId;
     bool executed;
     bool onVoting;
     ProposalType proposalType;
