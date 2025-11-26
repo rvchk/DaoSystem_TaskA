@@ -3,11 +3,11 @@ pragma solidity ^0.8.20;
 
 import "./ERC20Bundle.sol";
 
-contract Token is ERC20 {
-    address internal Tom = 0x990221C5080023298D2abE4C43e07d7D844894a9;
-    address internal Ben = 0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C;
-    address internal Rick = 0x2cE921Bff1c951914B062f2557d6914521bb8E77;
-    address internal Jack = 0xb7ec4240d2A4e5bfB8c398F13e7c47c4138b1A44;
+contract Token is ERC20, ERC20Permit, ERC20Votes {
+    address public Tom = 0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C;
+    address public Ben = 0x2cE921Bff1c951914B062f2557d6914521bb8E77;
+    address public Rick = 0x942aB5420dBd2838D89da4cfdDfE7c7D3C59BFC2;
+    address public Jack = 0xb7ec4240d2A4e5bfB8c398F13e7c47c4138b1A44;
 
     uint256 allTokenSupply;
 
@@ -15,7 +15,7 @@ contract Token is ERC20 {
         string memory name,
         string memory symbol,
         uint256 initialSupply
-    ) ERC20(name, symbol) {
+    ) ERC20(name, symbol) ERC20Permit(name) {
         allTokenSupply = initialSupply;
     }
 
@@ -24,6 +24,11 @@ contract Token is ERC20 {
         mint(Ben, allTokenSupply / 4);
         mint(Rick, allTokenSupply / 4);
         mint(Jack, allTokenSupply / 4);
+
+        _delegate(Tom, Tom);
+        _delegate(Ben, Ben);
+        _delegate(Rick, Rick);
+        _delegate(Jack, Jack);
     }
 
     function mint(address account, uint256 amount) public   {
@@ -43,5 +48,21 @@ contract Token is ERC20 {
 
     function decimals() public pure override returns(uint8) {
         return 12;
+    }
+
+    function _update(address from, address to, uint256 value)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._update(from, to, value);
+    }
+
+    function nonces(address owner)
+        public
+        view
+        override(ERC20Permit, Nonces)
+        returns (uint256)
+    {
+        return super.nonces(owner);
     }
 }

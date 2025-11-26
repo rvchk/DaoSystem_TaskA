@@ -1,20 +1,28 @@
 import { useEffect, useState } from "react";
 import { useData } from "../data/DataProvider";
 import { UserInfo } from "../components/shared/userInfo";
-import AllCurrentVotings from "../components/voting/allCurrentVotings";
 import VotingForm from "../components/voting/forms/votingForm";
+import VotingCard from "../components/voting/votingCard";
 
 export default function Voting() {
   const [votings, setVotings] = useState();
   const { smartContract } = useData();
 
   async function fetchVotingDetails() {
-    let details = [];
-    const currentVotings = await smartContract.getCurrentVotings();
-    for (let i = 0; i < currentVotings.length; i++) {
-      details.push(currentVotings[i].returnValues);
+    let currentProposals = [];
+    const pastProposals = await smartContract.getUserPastProposals();
+    for (let i = 0; i < pastProposals.length; i++) {
+      const proposalId = pastProposals[i].returnValues.proposalId;
+      const proposalInfo = await smartContract.getProposalInfo(proposalId);
+      if (proposalInfo.status > 0) {
+        currentProposals.push({
+          id: proposalId,
+          ...proposalInfo
+        });
+      }
     }
-    setVotings(details);
+
+    setVotings(currentProposals);
   }
 
   useEffect(() => {

@@ -61,7 +61,7 @@ export default function CreateProposalForm() {
       </Form.Select>
       <Form.Control type='text' placeholder='Описание' ref={descriptionRef} />
       <Form.Control type='text' placeholder='Нужный адрес' ref={addressRef} />
-      {currentPropose <= 1 && currentPropose == 4 && (
+      {(currentPropose <= 1 || currentPropose == 4) && (
         <Form.Control type='number' placeholder='Нужное количество' ref={amountRef} />
       )}
       {currentPropose > 1 && (

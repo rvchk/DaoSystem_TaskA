@@ -1,316 +1,396 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.27;
 
-import "./DaoTypes.sol";
-import { Token } from "./Token.sol";
+import "./GovernanceBundle.sol";
+import {Token} from "./Token.sol";
 
-contract DaoSystem {
-    address internal Tom = 0x990221C5080023298D2abE4C43e07d7D844894a9;
-    address internal Ben = 0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C;
-    address internal Rick = 0x2cE921Bff1c951914B062f2557d6914521bb8E77;
-    address internal Jack = 0xb7ec4240d2A4e5bfB8c398F13e7c47c4138b1A44;
-    address internal Fond = 0x942aB5420dBd2838D89da4cfdDfE7c7D3C59BFC2;
+contract MyGovernor is
+    Governor,
+    GovernorCountingSimple,
+    GovernorVotes,
+    GovernorVotesQuorumFraction
+{
+    // Адреса пользователей
+    address public constant TOM = 0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C;
+    address public constant BEN = 0x2cE921Bff1c951914B062f2557d6914521bb8E77;
+    address public constant RICK = 0x942aB5420dBd2838D89da4cfdDfE7c7D3C59BFC2;
+    address public constant JACK = 0xb7ec4240d2A4e5bfB8c398F13e7c47c4138b1A44;
+    address public constant FOND = 0x17F6AD8Ef982297579C203069C1DbfFE4348c372;
+    address public constant STARTUP_A =
+        0x5c6B0f7Bf3E7ce046039Bd8FABdfD3f9F5021678;
 
     Token internal Professional;
     Token internal RTKCoin;
 
-    // Отношение к Profi для обмена
-    uint256 public RtkExchangeRate = 2;
-    uint256 internal VoteTokenRate = 3; // 1 голос = 3 системных токена
-    uint256 public WrapTokenPrice = 1; // Цена wrap token = 1 ETH
-    uint256 public proposalCount = 0; // Счетчик предложений, вместо рандомного числа через super.propose
+    // Параметры системы
+    uint256 public constant VOTE_TOKEN_RATE = 3; // 1 голос = 3 системных токена
+    uint256 public constant WRAP_TOKEN_PRICE = 1 ether; // Цена wrap token = 1 ETH
+    uint256 public rtkExchangeRate = 2; // 1 RTK = 0.5 PROF (1/2)
 
-    // indexed нужен, чтобы можно было отфильтровать ивенты на Фронтенде, например Создание Предложения, только от определенного адреса
-    event VoteSupported(address indexed supporter, address indexed voter, uint256 indexed id, uint256 additionalVotes);
-    event VoteCast(address indexed voter,uint256 indexed id,bool support,uint256 votingPower,uint256 profiAmount);
-    event ProposalCreated(address indexed creator, uint256 id, ProposalType proposalType, string description, address targetAddress, uint256 targetAmount, bool indexed executed);
-    event VotingStarted(uint256 indexed id, uint256 startTime, uint256 endTime, address indexed initiator, uint256 votesFor, uint256 votesAgainst, VotingStatus indexed votingStatus, string description);
-    event ProposalExecuted(uint256 indexed id, VotingStatus indexed status);
-    event NewStartupInvestment(address indexed startup, uint256 amount);
-    event StartupInvestment(address indexed startup, uint256 amount);
-
-    // Все mapping
-    mapping(uint256 => mapping(address => VoteSupport)) public voteSupports;
-    mapping(uint256 => mapping(address => uint256)) public votes;
-    mapping(VotingStatus => uint256[]) public votingProposals;
-    mapping(uint256 => Proposal) public proposals;
-    mapping(uint256 => Voting) public votings;
-    mapping(address => User) public users;
-
-    constructor() {
-        // Создание стартапы с тикетом PROFI и токеном RTKCoin
-        Professional = new Token("Professional", "PROFI", 100_000);
-        RTKCoin = new Token("RTKCoin", "RTK", 20_000_000);
-
-        Professional.giveStartTokens();
-        RTKCoin.mint(address(this), 20_000_000 * 10**Professional.decimals());
-
-        addMember(Tom, "Tom", UserStatus.MEMBER);
-        addMember(Ben, "Ben", UserStatus.MEMBER);
-        addMember(Rick, "Rick", UserStatus.MEMBER);
-        addMember(Jack, "Jack", UserStatus.NOT_MEMBER);
+    // Структуры данных
+    enum UserStatus {
+        NOT_MEMBER,
+        MEMBER
+    }
+    enum QuorumType {
+        SIMPLE_MAJORITY,
+        SUPER_MAJORITY,
+        WEIGHTED
     }
 
-    // Проверка, чтобы функцию мог запускать только Участник DAO
+    struct User {
+        string name;
+        address userAddress;
+        UserStatus status;
+    }
+
+    struct VoteSupport {
+        address supporter;
+        address voter;
+        uint256 wrapTokens;
+        bool support;
+    }
+
+    enum ProposalType {
+        INVEST_NEW_STARTUP,
+        ADD_INVESTMENT,
+        ADD_MEMBER,
+        REMOVE_MEMBER,
+        MANAGE_WRAP_TOKEN
+    }
+
+    struct ProposalInfo {
+        ProposalType proposalType;
+        address targetAddress;
+        uint256 targetAmount;
+        string description;
+        bytes[] calldatas;
+        bool executed;
+        QuorumType quorumType;
+        address proposer;
+        uint256 tokenForVotes;
+        uint256 tokenAgainstVotes;
+    }
+
+    // Мэппинги
+    mapping(uint256 => ProposalInfo) public proposals;
+    mapping(address => User) public users;
+    mapping(uint256 => mapping(address => VoteSupport)) public voteSupports;
+    mapping(uint256 => mapping(address => uint256)) public wrapTokenSupports;
+
+    event VoteSupported(
+        address indexed supporter,
+        address indexed voter,
+        uint256 indexed proposalId,
+        uint256 wrapTokens
+    );
+    event NewStartupInvestment(address indexed startup, uint256 amount);
+    event StartupInvestment(address indexed startup, uint256 amount);
+    event MemberAdded(address indexed member);
+    event MemberRemoved(address indexed member);
+    event RTKExchangeRateChanged(uint256 newRate);
+
+    constructor(
+        IVotes _token
+    )
+        Governor("MyGovernor")
+        GovernorVotes(_token)
+        GovernorVotesQuorumFraction(4) // 4% кворум
+    {
+        Professional = Token(address(_token));
+        Professional.giveStartTokens();
+
+        RTKCoin = new Token("RTKCoin", "RTK", 20_000_000);
+        RTKCoin.mint(address(this), 20_000_000 * 10 ** Professional.decimals());
+
+        // Инициализация пользователей
+        _initializeUsers();
+    }
+
+    function _initializeUsers() internal {
+        users[TOM] = User("Tom", TOM, UserStatus.MEMBER);
+        users[BEN] = User("Ben", BEN, UserStatus.MEMBER);
+        users[RICK] = User("Rick", RICK, UserStatus.MEMBER);
+        users[JACK] = User("Jack", JACK, UserStatus.NOT_MEMBER);
+    }
+
+    // Модификатор для проверки участника DAO
     modifier onlyMember() {
-        require(users[msg.sender].status == UserStatus.MEMBER);
+        require(
+            users[msg.sender].status == UserStatus.MEMBER,
+            "Not a DAO member"
+        );
         _;
     }
 
-    // Добавление участника DAO при запуске системы
-    function addMember(address user, string memory name, UserStatus status) public {
-        users[user] = User(name, user, status);
-    }
-
-    // Исключение участника из DAO по его адресу
-    function removeUserFromDao(address user) public onlyMember {
-        users[user].status = UserStatus.NOT_MEMBER;
-    }
-
-    // При инициализации Mapping, солидити сам создает функцию (если mapping Public), для получения этого поля, тоесть эта функция не нужна
-    // function getUser(address user) public view returns(User memory) {
-    //     return users[user];
-    // }
-
-    // Функция, принимает адрес пользователя, возвращает его балансы Profi и RTK
-    function getUserBalance(address user) public view returns (uint256 wrap, uint256 profi) {
-        wrap = RTKCoin.balanceOf(user) / (10 ** 12);
-        profi = Professional.balanceOf(user) / (10 ** 12);
-    }
-
-    // Функция для покупки wrap за eth
-    function buyWrapWithEth(uint256 amount) public payable {
-        uint256 requiredEth = amount * WrapTokenPrice;
-        require(RTKCoin.balanceOf(address(this)) >= requiredEth, "Not enough WRAP tokens in contract");
-        
-        RTKCoin.transferTokens(address(this), msg.sender, requiredEth * 10 ** RTKCoin.decimals());
-    }
-
-    // Функция для покупки wrap за profi
-    function buyWrapWithProfi(uint256 amount) public {
-        uint256 requiredCost = amount * RtkExchangeRate;
-        Professional.transferTokens(msg.sender, address(this), requiredCost * 10 ** Professional.decimals());
-        RTKCoin.transferTokens(address(this), msg.sender, requiredCost * 10 ** RTKCoin.decimals());
-    }
-
-    // Функция создания предложения
+    // Основная функция создания предложения
     function propose(
         string memory description,
         QuorumType quorumType,
         ProposalType proposalType,
-        address targetAddress, // Адрес участника или стартапа
-        uint256 targetAmount // Сумма инвестиций или новый параметр
-    ) public returns (uint256) {
-        proposalCount++;
-        uint256 id = proposalCount;
-        
-        proposals[id] = Proposal({
-            id: id,
-            proposalType: proposalType,
-            proposer: msg.sender,
-            description: description,
-            executed: false,
-            onVoting: false,
-            targetAddress: targetAddress,
-            targetAmount: targetAmount
-        });
+        address targetAddress,
+        uint256 targetAmount
+    ) public onlyMember returns (uint256) {
+        address[] memory targets = new address[](1);
+        uint256[] memory values = new uint256[](1);
+        bytes[] memory calldatas = new bytes[](1);
 
-        votings[id] = Voting({
-            id: id,
-            initiator: msg.sender,
-            description: description,
-            startTime: 0,
-            endTime: 0,
-            status: VotingStatus.PENDING,
-            quorumType: quorumType,
-            votesFor: 0,
-            votesAgainst: 0,
-            voters: new address[](0) // Инициализация пустого массива voters
-        });  
+        targets[0] = address(this);
+        values[0] = 0;
 
-        emit ProposalCreated(msg.sender, id, proposalType, description, targetAddress, targetAmount, proposals[id].executed);
-        return id;
-    }
-
-    function deleteProposal(uint256 id) public {
-        delete proposals[id];
-    }
-
-    // Функция для начала голосования по предложению
-    function startVoting(uint256 id, uint256 timeForVoting) public {
-        Proposal storage proposal = proposals[id];
-        proposal.onVoting = true;
-
-        Voting storage voting = votings[id];
-        voting.startTime = block.timestamp; // Set startTime to current timestamp
-        voting.endTime = block.timestamp + timeForVoting; // Set endTime
-        voting.status = VotingStatus.ACTIVE; // Update status to ACTIVE
-        votingProposals[VotingStatus.ACTIVE].push(id);
-
-        emit VotingStarted(id, voting.startTime, voting.endTime, msg.sender, voting.votesFor, voting.votesAgainst, voting.status, voting.description);
-    }
-
-    function castVote(uint256 id, bool support, uint256 tokenAmount) public onlyMember {
-        Voting storage voting = votings[id];
-
-        require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
-        require(!hasVoted(id, msg.sender), "Already voted");
-
-        // Определяем вес голоса
-        uint256 votingPower;
-        if (proposals[id].proposalType == ProposalType.INVEST_NEW_STARTUP || 
-            proposals[id].proposalType == ProposalType.ADD_INVESTMENT) {
-            // Для инвестиционных предложений вес голоса равен количеству токенов Profi
-            votingPower = tokenAmount;
-        } else {
-            // Для остальных предложений один голос стоит 3 токена Profi
-            require(tokenAmount == 3, "Invalid token amount for non-investment proposals");
-            votingPower = 3;
+        // Заполняем массивы в зависимости от типа предложения
+        if (proposalType == ProposalType.INVEST_NEW_STARTUP) {
+            calldatas[0] = abi.encodeWithSignature(
+                "newStartupInvestment(address, uint256)",
+                targetAddress,
+                targetAmount
+            );
+        } else if (proposalType == ProposalType.ADD_INVESTMENT) {
+            calldatas[0] = abi.encodeWithSignature(
+                "startupInvestment(address, uint256)",
+                targetAddress,
+                targetAmount
+            );
+        } else if (proposalType == ProposalType.ADD_MEMBER) {
+            calldatas[0] = abi.encodeWithSignature(
+                "addUserToDao(address)",
+                targetAddress
+            );
+        } else if (proposalType == ProposalType.REMOVE_MEMBER) {
+            calldatas[0] = abi.encodeWithSignature(
+                "removeUserFromDao(address)",
+                targetAddress
+            );
+        } else if (proposalType == ProposalType.MANAGE_WRAP_TOKEN) {
+            calldatas[0] = abi.encodeWithSignature(
+                "executeTokenChange(address,uint256)",
+                targetAddress,
+                targetAmount
+            );
         }
 
-        require(Professional.balanceOf(msg.sender) >= tokenAmount, "Not enough Profi tokens");
+        uint256 proposalId = super.propose(
+            targets,
+            values,
+            calldatas,
+            description
+        );
 
-        // Вычитаем токены Profi у пользователя
-        Professional.transferTokens(msg.sender, address(this), tokenAmount * 10 ** Professional.decimals());
+        proposals[proposalId] = ProposalInfo({
+            proposalType: proposalType,
+            targetAddress: targetAddress,
+            targetAmount: targetAmount,
+            description: description,
+            calldatas: calldatas,
+            executed: false,
+            quorumType: quorumType,
+            proposer: msg.sender,
+            tokenForVotes: 0,
+            tokenAgainstVotes: 0
+        });
 
-        countVote(id, msg.sender, support ? 1 : 0, votingPower);
-        voting.voters.push(msg.sender);
-
-        emit VoteCast(msg.sender, id, support, votingPower, Professional.balanceOf(msg.sender));
+        return proposalId;
     }
 
-    function supportVote(uint256 id, address voter, uint256 wrapTokenAmount) public {
-        Voting storage voting = votings[id];
+    function castVote(
+        uint256 id,
+        uint8 support,
+        uint256 tokenAmount
+    ) public onlyMember {
+        ProposalInfo storage proposal = proposals[id];
 
-        require(voting.status == VotingStatus.ACTIVE, "Voting is not active");
-        require(!hasVoted(id, msg.sender), "Already voted");
+        if (tokenAmount > 1) {
+            proposal.tokenForVotes = support == 1 ? tokenAmount : 0;
+            proposal.tokenAgainstVotes = support == 1 ? 0 : tokenAmount;
+            super.castVote(id, support);
+        } else {
+            super.castVote(id, support);
+        }
+    }
 
-        // Проверяем, что адрес, который поддерживают, уже проголосовал
-        uint256 voterWeight = votes[id][voter];
-        require(voterWeight > 0, "The supported user has not voted yet");
+    // Функция выполнения предложения (вызывается через Governor)
+    function executeProposal(uint256 id) public {
+        require(state(id) == ProposalState.Succeeded, "Proposal not succeeded");
+        require(!proposals[id].executed, "Already executed");
 
-        // Проверяем, что у пользователя достаточно wrap токенов
-        require(RTKCoin.balanceOf(msg.sender) >= wrapTokenAmount, "Not enough wrap tokens");
+        ProposalInfo storage proposal = proposals[id];
+        address[] memory targets = new address[](1);
+        uint256[] memory values = new uint256[](1);
 
-        // Конвертируем wrap токены в голоса
-        uint256 additionalVotes = wrapTokenAmount / RtkExchangeRate;
+        targets[0] = address(this);
+        values[0] = 0;
 
-        RTKCoin.transferTokens(msg.sender, address(this), wrapTokenAmount);
+        bytes32 descriptionHash = keccak256(bytes(proposal.description));
 
-        // Проверяем, как проголосовал пользователь (за или против)
-        bool voterSupport = voteSupports[id][voter].support;
-        voterSupport
-            ? voting.votesFor += additionalVotes 
-            : voting.votesAgainst += additionalVotes;
+        super.execute(targets, values, proposal.calldatas, descriptionHash);
+    }
 
-        // Записываем данные о поддержке
-        voteSupports[id][msg.sender] = VoteSupport({
-            id: id,
+    // === ФУНКЦИИ ВЫПОЛНЕНИЯ ПРЕДЛОЖЕНИЙ ===
+
+    // Фукнция для новых вложений в стартап
+    function newStartupInvestment(
+        address startupAddress,
+        uint256 amount
+    ) external {
+        emit NewStartupInvestment(startupAddress, amount);
+    }
+
+    // Фукнция для вложений в стартап
+    function startupInvestment(
+        address startupAddress,
+        uint256 amount
+    ) internal {
+        emit StartupInvestment(startupAddress, amount);
+    }
+
+    function addMember(address member) public {
+        users[member].status = UserStatus.MEMBER;
+        emit MemberAdded(member);
+    }
+
+    function removeMember(address member) public {
+        users[member].status = UserStatus.NOT_MEMBER;
+        emit MemberRemoved(member);
+    }
+
+    function changeRTKExchangeRate(uint256 newRate) public {
+        rtkExchangeRate = newRate;
+        emit RTKExchangeRateChanged(newRate);
+    }
+
+    // === ФУНКЦИИ ДЕЛЕГИРОВАНИЯ И ПОДДЕРЖКИ ===
+
+    function supportVote(
+        uint256 proposalId,
+        address voter,
+        uint256 wrapTokenAmount
+    ) public {
+        require(state(proposalId) == ProposalState.Active, "Voting not active");
+        require(wrapTokenAmount > 0, "Amount must be positive");
+
+        // Проверяем баланс wrap токенов
+        require(
+            RTKCoin.balanceOf(msg.sender) >= wrapTokenAmount,
+            "Not enough RTK tokens"
+        );
+
+        // Переводим токены в контракт
+        RTKCoin.transferFrom(msg.sender, address(this), wrapTokenAmount);
+
+        // Записываем поддержку
+        voteSupports[proposalId][msg.sender] = VoteSupport({
+            supporter: msg.sender,
             voter: voter,
             wrapTokens: wrapTokenAmount,
-            support: voterSupport
+            support: true // Можно расширить для поддержки против
         });
 
-        emit VoteSupported(msg.sender, voter, id, additionalVotes);
+        wrapTokenSupports[proposalId][voter] += wrapTokenAmount;
+
+        emit VoteSupported(msg.sender, voter, proposalId, wrapTokenAmount);
     }
 
-    // Функция для отмены голосования
-    function cancelVoting(uint256 id) public onlyMember {
-        Voting storage voting = votings[id];
+    // === GETTER ФУНКЦИИ ===
 
-        // Возвращаем токены всем проголосовавшим участникам
-        for (uint i = 0; i < voting.voters.length; i++) {
-            address voter = voting.voters[i];
-            uint256 voteAmount = votes[id][voter];
-            
-            if (voteAmount > 0) {
-                Professional.transferFrom(voting.initiator, voter, voteAmount);
-            }
-        }
-    
-        voting.status = VotingStatus.DELETED;
-        proposals[id].onVoting = false;        
+    function getProposalDetails(
+        uint256 proposalId
+    )
+        public
+        view
+        returns (
+            ProposalState status,
+            address proposer,
+            uint256 forVotes,
+            uint256 againstVotes,
+            address targetAddress,
+            uint256 targetAmount,
+            string memory description,
+            bool executed,
+            ProposalType proposalType,
+            QuorumType quorumType
+        )
+    {
+        ProposalInfo memory proposal = proposals[proposalId];
+
+        uint256 against;
+        uint256 forVotes_;
+        uint256 abstain;
+
+        (against, forVotes_, abstain) = proposalVotes(proposalId);
+
+        status = state(proposalId);
+        proposer = proposalProposer(proposalId);
+
+        forVotes = proposal.tokenForVotes > 0
+            ? proposal.tokenForVotes
+            : (forVotes_ / (10 ** 12) / 10000);
+        againstVotes = proposal.tokenAgainstVotes > 0
+            ? proposal.tokenAgainstVotes
+            : (against / (10 ** 12) / 10000);
+
+        targetAddress = proposal.targetAddress;
+        targetAmount = proposal.targetAmount;
+        description = proposal.description;
+        executed = proposal.executed;
+        proposalType = proposal.proposalType;
+        quorumType = proposal.quorumType;
     }
 
-    // Функция для завершения голосования и выполнения предложения
-    function executeProposal(uint256 id) public {
-        Proposal storage proposal = proposals[id];
-        Voting storage voting = votings[id];
-        
-        if (quorumReached(id) && voteSucceeded(id)) {
-            voting.status = VotingStatus.APPROVED;
-            proposal.executed = true;
-            execute(id);
-            emit ProposalExecuted(id, voting.status);
-        } else {
-            voting.status = VotingStatus.REJECTED;
-        }
+    function getUserStatus(address user) public view returns (UserStatus) {
+        return users[user].status;
     }
 
-    // Внутренняя функция выполнения предложения
-    function execute(uint256 id) internal {
-        Proposal storage proposal = proposals[id];
-
-        if (proposal.proposalType == ProposalType.INVEST_NEW_STARTUP) {
-            emit NewStartupInvestment(proposal.targetAddress, proposal.targetAmount);
-        }
-        else if (proposal.proposalType == ProposalType.ADD_INVESTMENT) {
-            emit StartupInvestment(proposal.targetAddress, proposal.targetAmount);
-        }
-        else if (proposal.proposalType == ProposalType.ADD_MEMBER) {
-            users[proposal.targetAddress].status = UserStatus.MEMBER;
-        }
-        else if (proposal.proposalType == ProposalType.MANAGE_WRAP_TOKEN) {
-            RtkExchangeRate = proposal.targetAmount;
-        } 
-        else if (proposal.proposalType == ProposalType.REMOVE_MEMBER) {
-            removeUserFromDao(proposal.targetAddress);
-        }
+    function getUserBalances(
+        address user
+    ) public view returns (uint256 profi, uint256 rtk) {
+        profi = Professional.balanceOf(user);
+        rtk = RTKCoin.balanceOf(user);
     }
 
-    // Функция проверки достижения кворума, принимает ID предложения, при успехе возвращает true и наоборот
-    function quorumReached(uint256 id) public view returns (bool) {
-        Voting storage voting = votings[id];
-        Proposal storage proposal = proposals[id];
-
-        if (proposal.proposalType == ProposalType.INVEST_NEW_STARTUP || 
-            proposal.proposalType == ProposalType.ADD_INVESTMENT) {
-                return voting.votesFor > voting.votesAgainst;
-        }
-        else {
-            if (voting.quorumType == QuorumType.SIMPLE_MAJORITY) {
-                return voting.votesFor > voting.votesAgainst;
-            } else if (voting.quorumType == QuorumType.SUPER_MAJORITY) {
-                return voting.votesFor > (voting.votesFor + voting.votesAgainst) * 2 / 3;
-            }
-        }
-        revert("Invalid quorum conditions");
+    // Функция для покупки wrap за eth
+    function buyWrapWithEth(uint256 amount) public payable {
+        uint256 requiredEth = amount * WRAP_TOKEN_PRICE;
+        require(
+            RTKCoin.balanceOf(address(this)) >= requiredEth,
+            "Not enough WRAP tokens in contract"
+        );
+        RTKCoin.transferTokens(
+            address(this),
+            msg.sender,
+            requiredEth * 10 ** RTKCoin.decimals()
+        );
     }
 
-    function countVote(
-        uint256 id,
-        address account,
-        uint8 support,
-        uint256 weight
-    ) internal returns(uint256) {
-        Voting storage voting = votings[id];
-        require(!hasVoted(id, account), "Already voted");
-        
-        if (support == 1) {
-            voting.votesFor += weight / 3;
-        } else {
-            voting.votesAgainst += weight / 3;
-        }
-        
-        votes[id][account] = weight;
-        return weight;
+    // Функция для покупки wrap за profi
+    function buyWrapWithProfi(uint256 amount) public {
+        uint256 requiredCost = amount * rtkExchangeRate;
+        Professional.transferTokens(
+            msg.sender,
+            address(this),
+            requiredCost * 10 ** Professional.decimals()
+        );
+        RTKCoin.transferTokens(
+            address(this),
+            msg.sender,
+            requiredCost * 10 ** RTKCoin.decimals()
+        );
     }
 
-    function voteSucceeded(uint256 id) internal view returns (bool) {
-        Voting storage voting = votings[id];
-        return voting.votesFor > voting.votesAgainst;
+    // === ФУНКЦИИ Governor НАСТРОЙКИ ===
+
+    // Нужно прокинуть еще одну транзакцию, чтобы state предложения поменялся на АКТИВНЫЙ (1 для инициализации голосования)
+    function votingDelay() public pure override returns (uint256) {
+        return 1; // 1 блок
     }
-    function hasVoted(uint256 id, address account) public view returns (bool) {
-        return votes[id][account] > 0;
+
+    // На фронте при инициализации будет прокидываться пустая транзакция, для продвижения блоков
+    // Цифра в VotingPeriod по сути означает транзанкции которые могут быть, до конца голосования (время на фронте для примера)
+    function votingPeriod() public pure override returns (uint256) {
+        return 4; // 4 блока для демонстрации
+    }
+
+    function advanceBlock() public {
+        // ВНУТРИ НИЧЕГО НЕТ
+        // ¯\_(ツ)_/¯
     }
 }

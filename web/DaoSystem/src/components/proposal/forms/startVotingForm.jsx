@@ -19,7 +19,7 @@ export default function StartVotingForm() {
     }
     const timeForVoting = timeToSeconds(votingTimeRef.current.value);
     try {
-      smartContract.startVoting(proposeIdRef.current.value, timeForVoting);
+      smartContract.advanceBlock(1);
       proposeIdRef.current.value = "";
       votingTimeRef.current.value = "";
     } catch {

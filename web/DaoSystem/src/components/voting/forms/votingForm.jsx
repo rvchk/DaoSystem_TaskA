@@ -15,7 +15,9 @@ export default function VotingForm() {
       alert("Заполните все поля!");
       return;
     }
-    await smartContract.castVote(votingId.current.value, true, votingAmount);
+    if (votingAmount > 1) {
+      await smartContract.castVote(votingId.current.value, 1, votingAmount);
+    } else await smartContract.castVote(votingId.current.value, votingAmount, votingAmount);
   };
 
   const sendVoteAgainst = async () => {
@@ -23,7 +25,9 @@ export default function VotingForm() {
       alert("Заполните все поля!");
       return;
     }
-    await smartContract.castVote(votingId.current.value, false, votingAmount);
+    if (votingAmount > 1) {
+      await smartContract.castVote(votingId.current.value, 0, votingAmount);
+    } else await smartContract.castVote(votingId.current.value, votingAmount, votingAmount);
   };
 
   const supportVote = async () => {
