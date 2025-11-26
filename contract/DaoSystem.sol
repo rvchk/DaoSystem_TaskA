@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
+pragma solidity ^0.8.27;
 
+import "./GovernanceBundle.sol";
+import {Token} from "./Token.sol";
 import "./GovernanceBundle.sol";
 import {Token} from "./Token.sol";
 
@@ -115,6 +118,7 @@ contract MyGovernor is
     }
 
     // Модификатор для проверки участника DAO
+    // Модификатор для проверки участника DAO
     modifier onlyMember() {
         require(
             users[msg.sender].status == UserStatus.MEMBER,
@@ -126,7 +130,8 @@ contract MyGovernor is
     // Основная функция создания предложения
     function propose(
         string memory description,
-        QuorumType quorumType,
+        address targetAddress,
+        uint256 targetAmount,
         ProposalType proposalType,
         address targetAddress,
         uint256 targetAmount
@@ -180,7 +185,10 @@ contract MyGovernor is
             proposalType: proposalType,
             targetAddress: targetAddress,
             targetAmount: targetAmount,
+            targetAmount: targetAmount,
             description: description,
+            calldatas: calldatas,
+            executed: false,
             calldatas: calldatas,
             executed: false,
             quorumType: quorumType,
