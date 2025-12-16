@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useData } from "../../data/DataProvider";
 import { Button } from "react-bootstrap";
 
@@ -22,7 +22,7 @@ export default function VotingCard({ voting }) {
   };
 
   async function executeProposal() {
-    await smartContract.executeProposal(voting.id, voting.initiator);
+    await smartContract.executeProposal(voting.id, voting.proposer);
   }
 
   const cancelVoting = async () => {
@@ -63,18 +63,18 @@ export default function VotingCard({ voting }) {
             <img src='/delete-icon.png' alt='#' />
           </button>
         )}
-        <h3>Описание: {votingInfo?.description}</h3>
+        <h3>Описание: {voting?.description}</h3>
         <p>
-          ID голосования: {voting?.id.toString()}
+          ID голосования: {voting?.id.toString().slice(0, 6)}...
         </p>
         Создатель:{" "}
         <button className='copyButton' onClick={copyUserAddress}>
           {name}
         </button>
         <p>Выполнено: {voting?.executed ? "Да" : "Нет"}</p>
-        <p>Голоса за: {votingInfo?.votesFor}</p>
-        <p>Голоса против: {votingInfo?.votesAgainst}</p>
-        <p>Статус голосования: {votingStatus[votingInfo?.status]}</p>
+        <p>Голоса за: {voting?.forVotes}</p>
+        <p>Голоса против: {voting?.againstVotes}</p>
+        <p>Статус голосования: {votingStatus[voting?.status]}</p>
         <div>
           <h3 style={{ marginTop: "15px" }}>Обратный таймер</h3>
           <p className='votingTimer'>

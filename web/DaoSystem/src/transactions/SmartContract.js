@@ -13,13 +13,11 @@ export default class SmartContract {
 
 
   // Методы call()
-  getUserBalance = async (address) => this.func.getUserBalance(address).call();
+  getUserBalance = async (address) => this.func.getUserBalances(address).call();
   getUserObject = async (address) => this.func.users(address).call();
-  fetchUserProposals = async () => this.func.getUserProposals(this.selectedAccount).call();
-  getProposal = async (id) => this.func.getProposal(id).call();
-  getWrapExchange = async () => this.func.RtkExchangeRate().call();
-  getVotes = async (id) => this.func.votings(id).call();
-  getProposalInfo = async (id) => this.func.proposals(id).call();
+  getWrapExchange = async () => this.func.rtkExchangeRate().call();
+  // getVotes = async (id) => this.func.votings(id).call();
+  getProposalInfo = async (id) => this.func.getProposalDetails(id).call();
 
 
   // Методы send()
@@ -36,6 +34,7 @@ export default class SmartContract {
   castVote = async (id, support, tokenAmount) => this.sendTransaction("castVote", id, support, tokenAmount)
   deleteProposal = async (id) => this.sendTransaction("deleteProposal", id)
   executeProposal = async (id, creator) => this.sendTransaction("executeProposal", id, creator)
+  advanceBlock = async (number) => await this.sendTransaction("advanceBlock", number);
 
   createPropose = async (description, quorumType, currentPropose, memberOrStartup, amountOrParameter) => {
     return this.sendTransaction("propose", description, (currentPropose <= 1 ? 2 : quorumType), currentPropose, memberOrStartup, amountOrParameter)
@@ -48,13 +47,13 @@ export default class SmartContract {
     });
   }
 
+  
 
   // Методы PastEvents, обработка ивентов
   getPastEvents = async (func, filter) => this.events(func, { filter: filter, fromBlock: 0, toBlock: "latest" });
-
-  getUserPastProposals = async () => this.getPastEvents("ProposalCreated", { creator: this.selectedAccount, executed: "false" })
+  
+  getUserPastProposals = async () => this.getPastEvents("ProposalCreated", { proposer: this.selectedAccount })
   getCurrentVotings = async () => this.getPastEvents("VotingStarted", { votingStatus: "3" })
   getAllVotings = async () => this.getPastEvents("VotingStarted", {})
-  getInvestment = async () => this.getPastEvents("NewStartupInvestment", {})
   getAcceptedProposals = async () => this.getPastEvents("ProposalExecuted", {})
 }

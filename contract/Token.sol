@@ -3,11 +3,11 @@ pragma solidity ^0.8.20;
 
 import "./ERC20Bundle.sol";
 
-contract Token is ERC20, ERC20Permit, ERC20Votes {
-    address public Tom = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
-    address public Ben = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
-    address public Rick = 0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db;
-    address public Jack = 0xb7ec4240d2A4e5bfB8c398F13e7c47c4138b1A44;
+contract Token is ERC20 {
+    address internal Tom = 0x990221C5080023298D2abE4C43e07d7D844894a9;
+    address internal Ben = 0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C;
+    address internal Rick = 0x2cE921Bff1c951914B062f2557d6914521bb8E77;
+    address internal Jack = 0xb7ec4240d2A4e5bfB8c398F13e7c47c4138b1A44;
 
     uint256 allTokenSupply;
 

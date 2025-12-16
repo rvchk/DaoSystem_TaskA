@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useData } from "../data/DataProvider";
-import AllCurrentVotings from "../components/voting/allCurrentVotings";
 
 export default function AcceptedProposals() {
   const [votings, setVotings] = useState([]);

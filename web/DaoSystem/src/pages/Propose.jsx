@@ -22,9 +22,13 @@ function Propose() {
     let currentProposals = [];
     const pastProposals = await smartContract.getUserPastProposals();
     for (let i = 0; i < pastProposals.length; i++) {
-      currentProposals.push(
-        await smartContract.getProposalInfo(pastProposals[i].returnValues.id)
-      );
+      const proposalId = pastProposals[i].returnValues.proposalId;
+      const proposalInfo = await smartContract.getProposalInfo(proposalId);
+
+      currentProposals.push({
+        id: proposalId,
+        ...proposalInfo
+      });
     }
 
     setUserProposals(currentProposals);
@@ -40,7 +44,7 @@ function Propose() {
           <h2>Ваши предложения</h2>
           <div className='AllProposals'>
             {userProposals.map((proposal) => (
-              <ProposalCard proposal={proposal} key={proposal.id} />
+              <ProposalCard proposal={proposal} key={proposal.proposalId} />
             ))}
           </div>
         </>

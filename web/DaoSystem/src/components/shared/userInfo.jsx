@@ -6,14 +6,14 @@ export const UserInfo = () => {
   const { smartContract, selectedAccount, user } = useData();
   const [balance, setBalance] = useState({
     profi: 0,
-    wrap: 0
+    rtk: 0
   })
   
   async function getUserBalance() {
     const balance = await smartContract.getUserBalance(selectedAccount);
     setBalance({
-      profi: balance.profi || 0,
-      wrap: balance.wrap || 0
+      profi: String(balance.profi).slice(0, -12) || 0,
+      rtk: String(balance.rtk).slice(0, -12) || 0
     });
   }
 
@@ -30,7 +30,7 @@ export const UserInfo = () => {
       </Link>
       <div className='userInfoBalances'>
         <p>Profi: {balance.profi}</p>
-        <p>Wrap: {balance.wrap}</p>
+        <p>RTK: {balance.rtk}</p>
       </div>
     </div>
   );

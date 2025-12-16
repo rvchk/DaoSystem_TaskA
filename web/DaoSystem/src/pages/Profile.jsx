@@ -10,14 +10,15 @@ export default function Profile() {
   const [currentAmount, setCurrentAmount] = useState("");
   const [balance, setBalance] = useState({
     profi: 0,
-    wrap: 0
+    rtk: 0
   })
   
   async function getUserBalance() {
     const balance = await smartContract.getUserBalance(selectedAccount);
+    console.log(balance.rtk)
     setBalance({
-      profi: balance.profi || 0,
-      wrap: balance.wrap || 0
+      profi: String(balance.profi).slice(0, -12) || 0,
+      rtk: String(balance.rtk).slice(0, -12) || 0
     });
   }
 
@@ -50,7 +51,7 @@ export default function Profile() {
           <h1>{user?.name}</h1>
           <h2>{user?.status == 1 ? "Участник DAO" : "Не участник DAO"} </h2>
           <h2>Профи: {balance.profi}</h2>
-          <h2>Врап: {balance.wrap}</h2>
+          <h2>Врап: {balance.rtk}</h2>
         </Container>
       </Stack>
       <h2>Купить врап токены</h2>
