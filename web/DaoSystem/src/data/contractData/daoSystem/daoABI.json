@@ -600,7 +600,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "BEN",
+		"name": "Ben",
 		"outputs": [
 			{
 				"internalType": "address",
@@ -665,7 +665,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "JACK",
+		"name": "Jack",
 		"outputs": [
 			{
 				"internalType": "address",
@@ -678,7 +678,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "RICK",
+		"name": "Rick",
 		"outputs": [
 			{
 				"internalType": "address",
@@ -704,7 +704,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "TOM",
+		"name": "Tom",
 		"outputs": [
 			{
 				"internalType": "address",
@@ -750,13 +750,6 @@
 			}
 		],
 		"name": "addMember",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "advanceBlock",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -1704,45 +1697,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "description",
-				"type": "string"
-			},
-			{
-				"internalType": "enum MyGovernor.QuorumType",
-				"name": "quorumType",
-				"type": "uint8"
-			},
-			{
-				"internalType": "enum MyGovernor.ProposalType",
-				"name": "proposalType",
-				"type": "uint8"
-			},
-			{
-				"internalType": "address",
-				"name": "targetAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "targetAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "propose",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address[]",
 				"name": "targets",
 				"type": "address[]"
@@ -1761,6 +1715,50 @@
 				"internalType": "string",
 				"name": "description",
 				"type": "string"
+			}
+		],
+		"name": "propose",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "targetAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "targetAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "enum MyGovernor.ProposalType",
+				"name": "proposalType",
+				"type": "uint8"
+			},
+			{
+				"internalType": "enum MyGovernor.QuorumType",
+				"name": "quorumType",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "votingInMunutes",
+				"type": "uint256"
 			}
 		],
 		"name": "propose",
@@ -2112,7 +2110,20 @@
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "pure",
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "votingTime",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{

@@ -31,13 +31,15 @@ export default class SmartContract {
   supportVote = async (id, voter, amount) => this.sendTransaction("supportVote", id, voter, amount)
   startVoting = async (id, votingTime) => this.sendTransaction("startVoting", id, votingTime)
   cancelVoting = async (id) => this.sendTransaction("cancelVoting", id)
-  castVote = async (id, support, tokenAmount) => this.sendTransaction("castVote", id, support, tokenAmount)
+  castVote = async (id, support, tokenAmount) => {
+    console.log(id, support, tokenAmount)
+    this.sendTransaction("castVote", id, support, tokenAmount)
+  }
   deleteProposal = async (id) => this.sendTransaction("deleteProposal", id)
   executeProposal = async (id, creator) => this.sendTransaction("executeProposal", id, creator)
-  advanceBlock = async (number) => await this.sendTransaction("advanceBlock", number);
 
-  createPropose = async (description, quorumType, currentPropose, memberOrStartup, amountOrParameter) => {
-    return this.sendTransaction("propose", description, (currentPropose <= 1 ? 2 : quorumType), currentPropose, memberOrStartup, amountOrParameter)
+  createPropose = async (description, quorumType, currentPropose, memberOrStartup, amountOrParameter, votingTime) => {
+    return this.sendTransaction("propose", description, memberOrStartup, amountOrParameter, currentPropose, (currentPropose <= 1 ? 2 : quorumType), votingTime)
   }
 
   buyWrapTokensByEth = async (amount) => {

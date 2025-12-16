@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import contractABI from "../data/contractData/daoSystem/daoABI.json";
+import tokenABI from "../data/contractData/token/tokenABI.json";
+import { tokenByteCode } from "../data/contractData/token/tokenByteCode";
 import { daoByteCode } from "../data/contractData/daoSystem/daoByteCode";
 import SmartContract from "../transactions/SmartContract";
 import Web3 from "web3";
@@ -11,8 +13,7 @@ export function DataProvider({ children }) {
   const [smartContract, setSmartContract] = useState();
   const [user, setUser] = useState();
   const selectedAccount = localStorage.getItem("selectedAcc") || "";
-  const ownerAddress = "0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C";
-  const otherContractAddress = "0x9017C521b6Fd18f1cfB1c90fBdaa43fA55CFCF78"; // замените на нужный адрес
+  const ownerAddress = "0xda82d8e188e355c380d77616b2b63b0267aa68ed";
 
   useEffect(() => {
     initializeContract();
@@ -30,25 +31,38 @@ export function DataProvider({ children }) {
     }
   }
 
-  async function handleDeploy() {
+  async function createContract(abi, bytecode, args) {
     const web3 = new Web3(window.ethereum);
-    const contract = new web3.eth.Contract(contractABI);
-    
-    const deployedTransaction = contract.deploy({
-      data: daoByteCode,
-      arguments: [otherContractAddress]
+    const tokenContract = new web3.eth.Contract(abi);
+
+    const deployedTransaction = tokenContract.deploy({
+      data: bytecode,
+      arguments: args
     });
-    
+
     const gasPrice = await web3.eth.getGasPrice();
     const options = {
       from: ownerAddress,
       gas: "9986871",
       gasPrice: gasPrice.toString()
     };
-    
+
     const deployedContract = await deployedTransaction.send(options);
-    localStorage.setItem("contractId", deployedContract.options.address);
-    
+    return deployedContract.options.address
+  }
+
+  // Автодеплой двух контрактов, связанных между собой
+  async function handleDeploy() {
+    const tokenContract = await createContract(tokenABI, tokenByteCode, ["Test", "T", 10000])
+    localStorage.setItem("tokenContract", tokenContract);
+
+    setTimeout(async () => {
+      const token = localStorage.getItem("tokenContract", tokenContract);
+      const daoContract = await createContract(contractABI, daoByteCode, [token])
+
+      localStorage.setItem("contractId", daoContract);
+    }, 5000)
+
     // После деплоя сразу инициализируем контракт
     await handleContract();
   }
@@ -56,7 +70,7 @@ export function DataProvider({ children }) {
   async function handleContract() {
     const web3 = new Web3(window.ethereum);
     const contractAddress = localStorage.getItem("contractId");
-    
+
     if (!contractAddress) {
       console.error("No contract address found");
       return;
@@ -64,7 +78,7 @@ export function DataProvider({ children }) {
 
     const contract = new web3.eth.Contract(contractABI, contractAddress);
     setFactory(contract);
-    
+
     // Сразу создаем SmartContract экземпляр
     if (selectedAccount) {
       const smartContractTemp = new SmartContract(selectedAccount, contract);
@@ -83,17 +97,9 @@ export function DataProvider({ children }) {
   }, [selectedAccount, factory]);
 
   const getUser = async (smartContractInstance) => {
-    if (!smartContractInstance || !selectedAccount) {
-      console.error("SmartContract instance or selectedAccount is undefined");
-      return;
-    }
-
-    try {
-      const currentUser = await smartContractInstance.getUserObject(selectedAccount);
-      setUser(currentUser);
-    } catch (error) {
-      console.error("Error getting user:", error);
-    }
+    const currentUser = await smartContractInstance.getUserObject(selectedAccount);
+    console.log(currentUser)
+    setUser(currentUser);
   };
 
   return (

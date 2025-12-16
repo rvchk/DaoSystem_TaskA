@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useData } from "../../data/DataProvider";
+import { CardBody } from "react-bootstrap";
 
 export const ProposalDetails = ({ proposal }) => {
   const { smartContract } = useData();
@@ -24,7 +25,7 @@ export const ProposalDetails = ({ proposal }) => {
   }, [smartContract, getUser]);
 
   return (
-    <div className='proposal-details'>
+    <CardBody className='proposal-details'>
       {(proposal.proposalType == "0" || proposal.proposalType == "1") && (
         <div>
           <p>Количество инвестиций: {proposal.targetAmount} ETH</p>
@@ -63,6 +64,6 @@ export const ProposalDetails = ({ proposal }) => {
           </span>
         </div>
       )}
-    </div>
+    </CardBody>
   );
 };

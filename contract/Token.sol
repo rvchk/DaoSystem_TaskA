@@ -3,11 +3,11 @@ pragma solidity ^0.8.20;
 
 import "./ERC20Bundle.sol";
 
-contract Token is ERC20 {
-    address internal Tom = 0x990221C5080023298D2abE4C43e07d7D844894a9;
-    address internal Ben = 0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C;
-    address internal Rick = 0x2cE921Bff1c951914B062f2557d6914521bb8E77;
-    address internal Jack = 0xb7ec4240d2A4e5bfB8c398F13e7c47c4138b1A44;
+contract Token is ERC20, ERC20Permit, ERC20Votes {
+    address public Tom = 0xda82d8e188e355c380d77616B2b63b0267aA68eD;
+    address public Ben = 0xa0Fddc85DA6Fbe53D2e7d55cbDa9a22c3620816C;
+    address public Rick = 0x58E4a1126170CfA7CCF016a9362AE1a9f1c70914;
+    address public Jack = 0xB6458438e80Ad9bd3DD3DdB5FB1942a139C1ffD3;
 
     uint256 allTokenSupply;
 
@@ -19,7 +19,7 @@ contract Token is ERC20 {
         allTokenSupply = initialSupply;
     }
 
-    function giveStartTokens() external  {
+    function giveStartTokens() external {
         mint(Tom, allTokenSupply / 4);
         mint(Ben, allTokenSupply / 4);
         mint(Rick, allTokenSupply / 4);
@@ -31,7 +31,7 @@ contract Token is ERC20 {
         _delegate(Jack, Jack);
     }
 
-    function mint(address account, uint256 amount) public   {
+    function mint(address account, uint256 amount) public {
         _mint(account, amount * (10 ** decimals()));
     }
 
@@ -46,23 +46,21 @@ contract Token is ERC20 {
         return true;
     }
 
-    function decimals() public pure override returns(uint8) {
+    function decimals() public pure override returns (uint8) {
         return 12;
     }
 
-    function _update(address from, address to, uint256 value)
-        internal
-        override(ERC20, ERC20Votes)
-    {
+    function _update(
+        address from,
+        address to,
+        uint256 value
+    ) internal override(ERC20, ERC20Votes) {
         super._update(from, to, value);
     }
 
-    function nonces(address owner)
-        public
-        view
-        override(ERC20Permit, Nonces)
-        returns (uint256)
-    {
+    function nonces(
+        address owner
+    ) public view override(ERC20Permit, Nonces) returns (uint256) {
         return super.nonces(owner);
     }
 }

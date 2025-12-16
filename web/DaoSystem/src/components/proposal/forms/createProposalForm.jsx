@@ -10,6 +10,7 @@ export default function CreateProposalForm() {
   const descriptionRef = useRef();
   const addressRef = useRef();
   const amountRef = useRef();
+  const votingTimeRef = useRef();
 
   const handleChangeProposeCreation = (event) => {
     setCurrentPropose(event.target.value);
@@ -35,10 +36,13 @@ export default function CreateProposalForm() {
       quorumType || 2,
       currentPropose,
       addressRef.current.value,
-      amount
+      amount,
+      votingTimeRef.current.value
     );
+
     descriptionRef.current.value = "";
     addressRef.current.value = "";
+    votingTimeRef.current.value = "";
     location.reload();
   };
 
@@ -61,6 +65,7 @@ export default function CreateProposalForm() {
       </Form.Select>
       <Form.Control type='text' placeholder='Описание' ref={descriptionRef} />
       <Form.Control type='text' placeholder='Нужный адрес' ref={addressRef} />
+      <Form.Control type='number' placeholder='Голосование в минутах' ref={votingTimeRef} />
       {(currentPropose <= 1 || currentPropose == 4) && (
         <Form.Control type='number' placeholder='Нужное количество' ref={amountRef} />
       )}

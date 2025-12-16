@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
-pragma solidity ^0.8.27;
 
-import "./GovernanceBundle.sol";
-import {Token} from "./Token.sol";
 import "./GovernanceBundle.sol";
 import {Token} from "./Token.sol";
 
@@ -14,13 +11,12 @@ contract MyGovernor is
     GovernorVotesQuorumFraction
 {
     // Адреса пользователей
-    address public constant TOM = 0xD6f9EDa37aC1445755F3ec3c5Fa51660Ca40678C;
-    address public constant BEN = 0x2cE921Bff1c951914B062f2557d6914521bb8E77;
-    address public constant RICK = 0x942aB5420dBd2838D89da4cfdDfE7c7D3C59BFC2;
-    address public constant JACK = 0xb7ec4240d2A4e5bfB8c398F13e7c47c4138b1A44;
+    address public Tom = 0xda82d8e188e355c380d77616B2b63b0267aA68eD;
+    address public Ben = 0xa0Fddc85DA6Fbe53D2e7d55cbDa9a22c3620816C;
+    address public Rick = 0x58E4a1126170CfA7CCF016a9362AE1a9f1c70914;
+    address public Jack = 0xB6458438e80Ad9bd3DD3DdB5FB1942a139C1ffD3;
     address public constant FOND = 0x17F6AD8Ef982297579C203069C1DbfFE4348c372;
-    address public constant STARTUP_A =
-        0x5c6B0f7Bf3E7ce046039Bd8FABdfD3f9F5021678;
+    address public constant STARTUP_A = 0x5c6B0f7Bf3E7ce046039Bd8FABdfD3f9F5021678;
 
     Token internal Professional;
     Token internal RTKCoin;
@@ -29,6 +25,7 @@ contract MyGovernor is
     uint256 public constant VOTE_TOKEN_RATE = 3; // 1 голос = 3 системных токена
     uint256 public constant WRAP_TOKEN_PRICE = 1 ether; // Цена wrap token = 1 ETH
     uint256 public rtkExchangeRate = 2; // 1 RTK = 0.5 PROF (1/2)
+    uint256 public votingTime = 300;
 
     // Структуры данных
     enum UserStatus {
@@ -111,10 +108,10 @@ contract MyGovernor is
     }
 
     function _initializeUsers() internal {
-        users[TOM] = User("Tom", TOM, UserStatus.MEMBER);
-        users[BEN] = User("Ben", BEN, UserStatus.MEMBER);
-        users[RICK] = User("Rick", RICK, UserStatus.MEMBER);
-        users[JACK] = User("Jack", JACK, UserStatus.NOT_MEMBER);
+        users[Tom] = User("Tom", Tom, UserStatus.MEMBER);
+        users[Ben] = User("Ben", Ben, UserStatus.MEMBER);
+        users[Rick] = User("Rick", Rick, UserStatus.MEMBER);
+        users[Jack] = User("Jack", Jack, UserStatus.NOT_MEMBER);
     }
 
     // Модификатор для проверки участника DAO
@@ -133,8 +130,8 @@ contract MyGovernor is
         address targetAddress,
         uint256 targetAmount,
         ProposalType proposalType,
-        address targetAddress,
-        uint256 targetAmount
+        QuorumType quorumType,
+        uint256 votingInMunutes
     ) public onlyMember returns (uint256) {
         address[] memory targets = new address[](1);
         uint256[] memory values = new uint256[](1);
@@ -185,10 +182,7 @@ contract MyGovernor is
             proposalType: proposalType,
             targetAddress: targetAddress,
             targetAmount: targetAmount,
-            targetAmount: targetAmount,
             description: description,
-            calldatas: calldatas,
-            executed: false,
             calldatas: calldatas,
             executed: false,
             quorumType: quorumType,
@@ -197,6 +191,7 @@ contract MyGovernor is
             tokenAgainstVotes: 0
         });
 
+        votingTime = votingInMunutes * 60;
         return proposalId;
     }
 
@@ -386,19 +381,11 @@ contract MyGovernor is
 
     // === ФУНКЦИИ Governor НАСТРОЙКИ ===
 
-    // Нужно прокинуть еще одну транзакцию, чтобы state предложения поменялся на АКТИВНЫЙ (1 для инициализации голосования)
     function votingDelay() public pure override returns (uint256) {
         return 1; // 1 блок
     }
 
-    // На фронте при инициализации будет прокидываться пустая транзакция, для продвижения блоков
-    // Цифра в VotingPeriod по сути означает транзанкции которые могут быть, до конца голосования (время на фронте для примера)
-    function votingPeriod() public pure override returns (uint256) {
-        return 4; // 4 блока для демонстрации
-    }
-
-    function advanceBlock() public {
-        // ВНУТРИ НИЧЕГО НЕТ
-        // ¯\_(ツ)_/¯
+    function votingPeriod() public view override returns (uint256) {
+        return votingTime;
     }
 }

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useData } from "../data/DataProvider";
-import StartVotingForm from "../components/proposal/forms/startVotingForm";
 import CreateProposalForm from "../components/proposal/forms/createProposalForm";
 import ProposalCard from "../components/proposal/ProposalCard";
 
@@ -37,7 +36,6 @@ function Propose() {
   return (
     <>
       <h1>Предложения</h1>
-      <StartVotingForm />
       <CreateProposalForm />
       {userProposals.length > 0 && (
         <>
