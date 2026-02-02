@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
-
 import "./ERC20Bundle.sol";
 
 contract Token is ERC20, ERC20Permit, ERC20Votes {
@@ -14,12 +13,13 @@ contract Token is ERC20, ERC20Permit, ERC20Votes {
     constructor(
         string memory name,
         string memory symbol,
-        uint256 initialSupply
+        uint256 totalSupply
     ) ERC20(name, symbol) ERC20Permit(name) {
-        allTokenSupply = initialSupply;
+        allTokenSupply = totalSupply;
     }
 
-    function giveStartTokens() external {
+    // Функция для выдачи стартовых токенов пользователям, а также _delegate чтобы они могли голосовать от своего имени
+    function giveStartTokens() public {
         mint(Tom, allTokenSupply / 4);
         mint(Ben, allTokenSupply / 4);
         mint(Rick, allTokenSupply / 4);
@@ -31,25 +31,25 @@ contract Token is ERC20, ERC20Permit, ERC20Votes {
         _delegate(Jack, Jack);
     }
 
-    function mint(address account, uint256 amount) public {
-        _mint(account, amount * (10 ** decimals()));
+    function mint(address account, uint256 value) public {
+        _mint(account, value * (10 ** decimals()));
     }
 
-    //Самописная функция для перевода токенов, принимает адрес от кого хотите передать, кому хотите, количество
-    //Возвращает в случее успеха true
-    function transferTokens(
-        address from,
-        address to,
-        uint256 amount
-    ) public returns (bool) {
-        _transfer(from, to, amount);
-        return true;
-    }
-
+    // Функция для получения количества нулей, в задании 12
     function decimals() public pure override returns (uint8) {
         return 12;
     }
 
+    // Функция перевода токенов
+    function transferTokens(
+        address from,
+        address to,
+        uint256 value
+    ) public payable {
+        _transfer(from, to, value);
+    }
+
+    // Зависимость ERC20Votes и ERC20Permit
     function _update(
         address from,
         address to,
@@ -58,9 +58,10 @@ contract Token is ERC20, ERC20Permit, ERC20Votes {
         super._update(from, to, value);
     }
 
+    // Зависимость ERC20Votes и ERC20Permit
     function nonces(
         address owner
-    ) public view override(ERC20Permit, Nonces) returns (uint256) {
+    ) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
         return super.nonces(owner);
     }
 }
